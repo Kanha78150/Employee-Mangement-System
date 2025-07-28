@@ -9,7 +9,14 @@ const bcrypt = require("bcrypt");
 dotenv.config();
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: true, // Allow all origins
+    credentials: true, // Allow cookies and credentials
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 
 // ✅ Connect DB
@@ -24,7 +31,10 @@ app.use("/api/analytics", require("./routes/analyticsRoutes"));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ Server running on ${PORT}`));
+const HOST = process.env.HOST || "0.0.0.0";
+app.listen(PORT, HOST, () =>
+  console.log(`✅ Server running on ${HOST}:${PORT}`)
+);
 
 /**
  * ✅ Create default admin if not exists
@@ -36,8 +46,7 @@ async function createDefaultAdmin() {
 
     const existing = await Admin.findOne({ email });
     if (!existing) {
-      const hashed = await bcrypt.hash(password, 10);
-      await Admin.create({ email, password: hashed });
+      await Admin.create({ email, password });
       console.log(`✅ Default Admin created: ${email} / ${password}`);
     } else {
       console.log("ℹ️ Default admin already exists.");
