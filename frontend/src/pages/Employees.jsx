@@ -97,6 +97,10 @@ export default function Employees() {
     mutationFn: async ({ id, data }) => {
       try {
         console.log("Updating employee:", id);
+        console.log(data);
+
+        data.delete("employeeId");
+         
         console.log("Update data:", Object.fromEntries(data.entries()));
 
         const response = await api.put(`/employees/${id}`, data);
