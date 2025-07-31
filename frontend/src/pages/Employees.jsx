@@ -446,7 +446,7 @@ export default function Employees() {
               <td className="p-3">
                 {emp.image ? (
                   <img
-                    src={emp.image}
+                    src={import.meta.env.VITE_API_URL + emp.image}
                     alt={emp.name}
                     className="h-10 w-10 rounded-full object-cover"
                   />

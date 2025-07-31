@@ -10,6 +10,7 @@ const {
 const protect = require("../middleware/authMiddleware");
 const permit = require("../middleware/roleMiddleware");
 const validateBody = require("../middleware/validateBody");
+const upload = require("../middleware/uploadMiddleware");
 const {
   createEmployeeSchema,
   updateEmployeeSchema,
@@ -19,6 +20,7 @@ router.post(
   "/",
   protect,
   permit("admin"),
+  upload.single("image"),
   validateBody(createEmployeeSchema),
   createEmployee
 );
