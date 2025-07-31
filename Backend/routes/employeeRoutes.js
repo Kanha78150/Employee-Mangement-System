@@ -27,12 +27,14 @@ router.post(
 router.get("/", protect, permit("admin"), getEmployees);
 router.get("/:id", protect, permit("admin", "employee"), getEmployeeById);
 router.put(
-  "/profile",
+  "/:id",
   protect,
-  permit("employee"),
+  permit("admin"),
+  upload.single("image"),
   validateBody(updateEmployeeSchema),
   updateProfile
 );
+
 router.delete("/:id", protect, permit("admin"), deleteEmployee);
 
 module.exports = router;

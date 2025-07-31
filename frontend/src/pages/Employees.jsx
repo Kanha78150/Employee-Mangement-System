@@ -11,7 +11,7 @@ const formatDate = (dateString) => {
     day: "numeric",
   });
 };
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 export default function Employees() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
@@ -446,7 +446,7 @@ export default function Employees() {
               <td className="p-3">
                 {emp.image ? (
                   <img
-                    src={import.meta.env.VITE_API_URL + emp.image}
+                    src={`${backendUrl}${emp.image}`}
                     alt={emp.name}
                     className="h-10 w-10 rounded-full object-cover"
                   />
