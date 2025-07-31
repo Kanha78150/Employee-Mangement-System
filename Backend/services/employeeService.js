@@ -50,20 +50,32 @@ exports.getEmployeeById = async (id) => {
   return Employee.findById(id);
 };
 
-exports.updateProfile = async (userId, data) => {
-  const allowedFields = ["name", "email", "image"];
-  const update = {};
-  allowedFields.forEach((key) => {
-    if (data[key]) update[key] = data[key];
-  });
-  return Employee.findByIdAndUpdate(userId, update, { new: true });
+exports.updateProfile = async (id, updateData) => {
+  try {
+    const employee = await Employee.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select("-password"); // Exclude password from response
+
+    return employee;
+  } catch (error) {
+    throw error;
+  }
 };
 
 exports.deleteEmployee = async (adminId, empId) => {
-  await Employee.findByIdAndUpdate(empId, { isDeleted: true });
+  // Change from findByIdAndUpdate to findByIdAndDelete
+  const deletedEmployee = await Employee.findByIdAndDelete(empId);
+
+  if (!deletedEmployee) {
+    throw new Error("Employee not found");
+  }
+
   await AuditLog.create({
     user: adminId,
-    action: `Archived employee ${empId}`,
+    action: `Permanently deleted employee ${deletedEmployee.employeeId}`,
   });
-  return { message: "Employee archived" };
+
+  return { message: "Employee permanently deleted" };
 };

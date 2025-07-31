@@ -5,6 +5,8 @@ const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorMiddleware");
 const Admin = require("./models/Admin");
 const bcrypt = require("bcrypt");
+const path = require("path");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 dotenv.config();
 const app = express();
@@ -18,6 +20,8 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ Connect DB
 connectDB().then(() => createDefaultAdmin()); // ✅ Ensure default admin
@@ -26,7 +30,7 @@ connectDB().then(() => createDefaultAdmin()); // ✅ Ensure default admin
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/employees", require("./routes/employeeRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
-app.use("/api/analytics", require("./routes/analyticsRoutes"));
+app.use("/api/analytics", analyticsRoutes);
 
 app.use(errorHandler);
 

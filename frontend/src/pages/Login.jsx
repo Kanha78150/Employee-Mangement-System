@@ -17,10 +17,18 @@ export default function Login() {
     try {
       let res;
       if (form.type === "admin") {
-        res = await api.post("/auth/admin", {
-          email: form.email,
-          password: form.password,
-        });
+        res = await api.post(
+          "/auth/admin",
+          {
+            email: form.email,
+            password: form.password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
       } else {
         res = await api.post("/auth/employee", {
           employeeId: form.employeeId,
@@ -58,6 +66,7 @@ export default function Login() {
             <input
               className="border p-2 w-full mb-2"
               placeholder="Admin Email"
+              type="email" // Add this
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />

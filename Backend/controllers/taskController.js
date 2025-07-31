@@ -2,7 +2,11 @@ const taskService = require("../services/taskService");
 
 exports.assignTask = async (req, res, next) => {
   try {
-    const task = await taskService.assignTask(req.user.id, req.body);
+    const taskData = {
+      ...req.body,
+      attachment: req.file ? `/uploads/${req.file.filename}` : undefined,
+    };
+    const task = await taskService.assignTask(req.user.id, taskData);
     res.status(201).json(task);
   } catch (err) {
     next(err);
