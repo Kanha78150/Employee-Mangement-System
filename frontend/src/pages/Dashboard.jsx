@@ -21,14 +21,6 @@ export default function Dashboard() {
           <h3 className="text-lg font-bold">Total Tasks</h3>
           <p>{data.totalTasks}</p>
         </div>
-        <div className="p-4 bg-white shadow rounded">
-          <h3 className="text-lg font-bold">Completed Tasks</h3>
-          <p>{data.completedTasks}</p>
-        </div>
-        <div className="p-4 bg-white shadow rounded">
-          <h3 className="text-lg font-bold">Ongoing Tasks</h3>
-          <p>{data.ongoingTasks}</p>
-        </div>
       </div>
     </div>
   );

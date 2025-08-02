@@ -45,7 +45,4 @@ router.patch(
   updateTaskStatus
 );
 
-// File uploads
-router.post("/upload", protect, upload.single("document"), uploadAttachment);
-
 module.exports = router;

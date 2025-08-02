@@ -4,7 +4,6 @@ exports.assignTask = async (req, res, next) => {
   try {
     const taskData = {
       ...req.body,
-      attachment: req.file ? `/uploads/${req.file.filename}` : undefined,
     };
     const task = await taskService.assignTask(req.user.id, taskData);
     res.status(201).json(task);
@@ -37,15 +36,10 @@ exports.updateTaskStatus = async (req, res, next) => {
     const task = await taskService.updateTaskStatus(
       req.user,
       req.params.id,
-      req.body.status
+      req.body.completion
     );
     res.json(task);
   } catch (err) {
     next(err);
   }
-};
-
-exports.uploadAttachment = (req, res) => {
-  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-  res.json({ file: req.file.filename, url: `/uploads/${req.file.filename}` });
 };

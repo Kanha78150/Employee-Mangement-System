@@ -4,11 +4,33 @@ const AuditLog = require("../models/AuditLog");
 const { sendEmail } = require("../utils/sendMail");
 
 exports.assignTask = async (adminId, data) => {
-  const { employeeId, title, description } = data;
+  const {
+    employeeId,
+    title,
+    description,
+    reMarks,
+    startTime,
+    endTime,
+    taskDate,
+    organization,
+    priority,
+    completion,
+  } = data;
   const employee = await Employee.findById(employeeId);
   if (!employee) throw new Error("Invalid employee");
 
-  const task = await Task.create({ employee: employeeId, title, description });
+  const task = await Task.create({
+    employee: employeeId,
+    title,
+    description,
+    reMarks,
+    startTime,
+    endTime,
+    taskDate,
+    organization,
+    priority,
+    completion,
+  });
   await AuditLog.create({
     user: adminId,
     action: `Assigned task "${title}" to ${employeeId}`,
@@ -36,7 +58,7 @@ exports.getMyTasks = async (userId) => {
 };
 
 // Employee updates task status
-exports.updateTaskStatus = async (reqUser, taskId, status) => {
+exports.updateTaskStatus = async (reqUser, taskId, completion) => {
   const task = await Task.findById(taskId);
   if (!task) throw new Error("Task not found");
 
@@ -44,12 +66,12 @@ exports.updateTaskStatus = async (reqUser, taskId, status) => {
     throw new Error("Not authorized for this task");
   }
 
-  task.status = status;
+  task.completion = completion;
   await task.save();
 
   await AuditLog.create({
     user: reqUser.id,
-    action: `Updated task ${taskId} status to ${status}`,
+    action: `Updated task ${taskId} status to ${completion}%`,
   });
 
   return task;

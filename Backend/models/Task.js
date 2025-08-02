@@ -23,9 +23,41 @@ const taskSchema = new mongoose.Schema({
     trim: true,
     maxlength: [2000, "Remarks cannot exceed 1000 characters"],
   },
+  startTime: {
+    type: String,
+    required: [true, "Start time is required"],
+    validate: {
+      validator: function (v) {
+        const regex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+        if (!regex.test(v)) return false;
+        const [hour] = v.split(":").map(Number);
+        return hour >= 9 && hour <= 21;
+      },
+      message: "Start time must be between 09:00 and 21:00 in HH:MM format",
+    },
+  },
+  endTime: {
+    type: String,
+    required: [true, "End time is required"],
+    validate: {
+      validator: function (v) {
+        const regex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+        if (!regex.test(v)) return false;
+        const [hour] = v.split(":").map(Number);
+        return hour >= 9 && hour <= 21;
+      },
+      message: "End time must be between 09:00 and 21:00 in HH:MM format",
+    },
+  },
   taskDate: {
     type: Date,
     required: [true, "Task date is required"],
+    validate: {
+      validator: function (v) {
+        return v instanceof Date && !isNaN(v);
+      },
+      message: "Task date must be a valid date",
+    },
   },
   organization: {
     type: String,
@@ -38,6 +70,13 @@ const taskSchema = new mongoose.Schema({
     enum: ["Low", "Medium", "High"],
     default: "Medium",
     required: [true, "Task priority is required"],
+  },
+  completion: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 0,
+    required: true,
   },
 });
 
