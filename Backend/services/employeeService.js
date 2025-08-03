@@ -66,7 +66,11 @@ exports.updateProfile = async (id, updateData) => {
 
 exports.deleteEmployee = async (adminId, empId) => {
   // Change from findByIdAndUpdate to findByIdAndDelete
-  const deletedEmployee = await Employee.findByIdAndDelete(empId);
+  const deletedEmployee = await Employee.findByIdAndUpdate(
+    empId,
+    { $set: { isDeleted: true } },
+    { new: true }
+  );
 
   if (!deletedEmployee) {
     throw new Error("Employee not found");
