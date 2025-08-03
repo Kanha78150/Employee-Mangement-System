@@ -1,13 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import api from "../api/axiosInstance";
-import { useAuth } from "../context/AuthContext";
 
 export default function Analytics() {
   // Search state
   const [search, setSearch] = useState("");
-  const { user } = useAuth();
-  const employeeId = user?.id;
 
   // Fetch all tasks for analytics
   const { data: allTasks = [], isLoading } = useQuery({

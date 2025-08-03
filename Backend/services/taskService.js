@@ -77,7 +77,7 @@ exports.updateTaskStatus = async (reqUser, taskId, completion) => {
   return task;
 };
 
-// NEW: Admin – get all tasks
+// Admin – get all tasks
 exports.getAllTasks = async () => {
   return Task.find().populate("employee", "name employeeId");
 };
