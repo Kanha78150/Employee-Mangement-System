@@ -43,3 +43,13 @@ exports.updateTaskStatus = async (req, res, next) => {
     next(err);
   }
 };
+
+// NEW: Admin – get all tasks
+exports.getAllTasks = async (req, res, next) => {
+  try {
+    const tasks = await taskService.getAllTasks();
+    res.json(tasks);
+  } catch (err) {
+    next(err);
+  }
+};

@@ -9,17 +9,11 @@ export default function Analytics() {
   const { user } = useAuth();
   const employeeId = user?.id;
 
-  // Fetch all tasks
+  // Fetch all tasks for analytics
   const { data: allTasks = [], isLoading } = useQuery({
-    queryKey: ["allTasks", employeeId],
-    queryFn: async () => (await api.get(`/tasks/employee/${employeeId}`)).data,
+    queryKey: ["allTasks"],
+    queryFn: async () => (await api.get(`/tasks`)).data,
   });
-
-  //! StandBy
-  // const { data: tasks = [], isLoading } = useQuery({
-  //   queryKey: ["employeeTasks", user?.id],
-  //   queryFn: async () => (await api.get(`/tasks/employee/${user.id}`)).data,
-  // });
 
   // Format date utility
   const formatDate = (dateString) => {
@@ -32,12 +26,13 @@ export default function Analytics() {
   };
 
   // Filter tasks based on search input
-  const filteredTasks = allTasks.filter(
-    (t) =>
-      t.title.toLowerCase().includes(search.toLowerCase()) ||
-      t.description.toLowerCase().includes(search.toLowerCase()) ||
-      t.organization.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredTasks = allTasks.filter((t) => {
+    const title = (t.title ?? "").toLowerCase();
+    const desc = (t.description ?? "").toLowerCase();
+    const org = (t.organization ?? "").toLowerCase();
+    const term = search.toLowerCase();
+    return title.includes(term) || desc.includes(term) || org.includes(term);
+  });
 
   if (isLoading) return <div className="p-4">Loading tasks...</div>;
 
@@ -46,8 +41,8 @@ export default function Analytics() {
       <h2 className="text-xl font-bold mb-4">Assigned Tasks</h2>
       <input
         type="text"
-        className="border p-2 mb-4 w-full"
-        placeholder="Search by title, description, or organization"
+        className="border p-2 mb-4 w-lg bg-gray-100 rounded"
+        placeholder="Search by title, employeeName, or organization"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -68,7 +63,7 @@ export default function Analytics() {
         <tbody>
           {filteredTasks.map((t) => (
             <tr key={t._id} className="border-b">
-              <td className="p-2">{t.employeeName || t.employeeId}</td>
+              <td className="p-2">{t.employee?.name ?? "-"}</td>
               <td className="p-2">{t.title}</td>
               <td className="p-2">{t.description}</td>
               <td className="p-2">{t.startTime}</td>

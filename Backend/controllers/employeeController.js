@@ -85,7 +85,6 @@ exports.deleteEmployee = async (req, res, next) => {
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-
     const result = await employeeService.deleteEmployee(req.user.id, id);
     res.json(result);
   } catch (err) {

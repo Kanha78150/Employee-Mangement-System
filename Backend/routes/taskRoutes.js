@@ -4,7 +4,7 @@ const {
   getEmployeeTasks,
   getMyTasks,
   updateTaskStatus,
-  uploadAttachment,
+  getAllTasks,
 } = require("../controllers/taskController");
 
 const protect = require("../middleware/authMiddleware");
@@ -24,6 +24,9 @@ router.post(
   validateBody(assignTaskSchema),
   assignTask
 );
+
+// Admin: Get all tasks (for analytics)
+router.get("/", protect, permit("admin"), getAllTasks);
 
 // Admin view specific employee tasks
 router.get(
