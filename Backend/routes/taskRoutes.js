@@ -40,8 +40,8 @@ router.get(
 router.get("/my", protect, permit("employee"), getMyTasks);
 
 // Employee updates own task status
-router.patch(
-  "/:id",
+router.put(
+  "/update/:id",
   protect,
   permit("employee"),
   validateBody(updateTaskSchema),
