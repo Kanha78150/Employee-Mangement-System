@@ -18,7 +18,6 @@ export default function Employees() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     name: "",
-    employeeId: "",
     email: "",
     password: "",
     department: "Technical",
@@ -68,7 +67,6 @@ export default function Employees() {
       queryClient.invalidateQueries(["employees"]);
       setForm({
         name: "",
-        employeeId: "",
         email: "",
         password: "",
         department: "Technical",
@@ -116,7 +114,6 @@ export default function Employees() {
       setEditingEmployee(null);
       setForm({
         name: "",
-        employeeId: "",
         email: "",
         password: "",
         department: "Technical",
@@ -168,7 +165,6 @@ export default function Employees() {
     setEditingEmployee(emp._id);
     setForm({
       name: emp.name,
-      employeeId: emp.employeeId,
       email: emp.email,
       password: "", // Don't set the password
       department: emp.department,
@@ -199,7 +195,6 @@ export default function Employees() {
     // Validate required fields
     const requiredFields = {
       name: "Name",
-      employeeId: "Employee ID",
       email: "Email",
       password: !editingEmployee ? "Password" : null,
       department: "Department",
@@ -284,7 +279,7 @@ export default function Employees() {
               onChange={handleChange}
             />
           </div>
-          <div>
+          {/* <div>
             <label className="block mb-2 font-medium text-gray-700">
               Employee ID
             </label>
@@ -296,7 +291,7 @@ export default function Employees() {
               onChange={handleChange}
               required
             />
-          </div>
+          </div> */}
           <div>
             <label className="block mb-2 font-medium text-gray-700">
               Email

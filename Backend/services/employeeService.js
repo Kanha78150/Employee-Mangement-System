@@ -2,9 +2,31 @@ const Employee = require("../models/Employee");
 const AuditLog = require("../models/AuditLog");
 const { sendEmail } = require("../utils/sendMail");
 
+const generateEmployeeId = async () => {
+  // Format: EMP+XX+NUMBER (e.g., EMP+AB+1234)
+  const randomLetters = () => {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return (
+      letters[Math.floor(Math.random() * 26)] +
+      letters[Math.floor(Math.random() * 26)]
+    );
+  };
+  let unique = false;
+  let employeeId = "";
+  while (!unique) {
+    const letters = randomLetters();
+    const number = Math.floor(1000 + Math.random() * 9000); // 4 digits
+    employeeId = `EMP${letters}${number}`;
+    const exists = await Employee.findOne({ employeeId });
+    if (!exists) unique = true;
+  }
+  return employeeId;
+};
+
 exports.createEmployee = async (adminId, data) => {
-  const exists = await Employee.findOne({ employeeId: data.employeeId });
-  if (exists) throw new Error("Employee ID already exists");
+  // Remove employeeId from input if present
+  if (data.employeeId) delete data.employeeId;
+  data.employeeId = await generateEmployeeId();
 
   const employee = await Employee.create(data);
   await AuditLog.create({
@@ -14,7 +36,7 @@ exports.createEmployee = async (adminId, data) => {
   await sendEmail(
     employee.email,
     "Welcome to Employee Dashboard",
-    `Hello ${employee.name}, you are registered as ${employee.role}.`
+    `Hello ${employee.name}, you are registered as ${employee.role}. Your Employee ID is ${employee.employeeId}.`
   );
 
   return employee;
