@@ -101,7 +101,8 @@ export default function Employees() {
         // console.log("Update response:", response.data);
         return response.data;
       } catch (error) {
-        console.error("Update error:", error);
+        // console.error("Update error:", error);
+        toast.error("Failed to update employee: " + error.message);
         throw error;
       }
     },
