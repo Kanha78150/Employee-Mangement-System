@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const { login } = useAuth();
@@ -36,8 +37,10 @@ export default function Login() {
         });
       }
       login(res.data.token);
+      toast.success("Login successful!");
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      // alert(err.response?.data?.message || "Login failed")
+      toast.error(err.response?.data?.message || "Login failed");
     }
   };
 

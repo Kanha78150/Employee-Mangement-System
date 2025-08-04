@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import api from "../api/axiosInstance";
+import { toast } from "react-toastify";
+import Loader from "../UI/Loader";
 
 // To Get Proper Date Format
 const formatDate = (dateString) => {
@@ -39,7 +41,8 @@ export default function Employees() {
         // console.log("Fetched employees:", response.data);
         return response.data;
       } catch (error) {
-        console.error("Fetch error:", error);
+        // console.error("Fetch error:", error);
+        toast.error("Failed to fetch employees: " + error.message);
         throw error;
       }
     },
@@ -52,26 +55,16 @@ export default function Employees() {
   const createEmployee = useMutation({
     mutationFn: async (newEmp) => {
       try {
-        // Log the data being sent
-        console.log(
-          "Creating employee with data:",
-          Object.fromEntries(newEmp.entries())
-        );
-
         const response = await api.post("/employees", newEmp);
         return response.data;
       } catch (error) {
-        // Log the full error details
-        console.error("Create error details:", {
-          message: error.message,
-          response: error.response?.data,
-          status: error.response?.status,
-        });
+        // Throw a more user-friendly error
         throw new Error(error.response?.data?.message || error.message);
       }
     },
     onSuccess: () => {
-      alert("Employee created successfully!");
+      // alert("Employee created successfully!");
+      toast.success("Employee created successfully!");
       queryClient.invalidateQueries(["employees"]);
       setForm({
         name: "",
@@ -87,8 +80,9 @@ export default function Employees() {
       });
     },
     onError: (error) => {
-      console.error("Create failed:", error);
-      alert("Failed to create employee: " + error.message);
+      // console.error("Create failed:", error);
+      // alert("Failed to create employee: " + error.message);
+      toast.error("Failed to create employee: " + error.message);
     },
   });
 
@@ -96,15 +90,15 @@ export default function Employees() {
   const updateEmployee = useMutation({
     mutationFn: async ({ id, data }) => {
       try {
-        console.log("Updating employee:", id);
-        console.log(data);
+        // console.log("Updating employee:", id);
+        // console.log(data);
 
         data.delete("employeeId");
-         
-        console.log("Update data:", Object.fromEntries(data.entries()));
+
+        // console.log("Update data:", Object.fromEntries(data.entries()));
 
         const response = await api.put(`/employees/${id}`, data);
-        console.log("Update response:", response.data);
+        // console.log("Update response:", response.data);
         return response.data;
       } catch (error) {
         console.error("Update error:", error);
@@ -113,7 +107,8 @@ export default function Employees() {
     },
     onSuccess: (data) => {
       // console.log("Update successful:", data);
-      alert("Employee updated successfully!");
+      // alert("Employee updated successfully!");
+      toast.success("Employee updated successfully!");
       // Force refetch
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       // Reset form
@@ -132,8 +127,7 @@ export default function Employees() {
       });
     },
     onError: (error) => {
-      console.error("Update failed:", error);
-      alert("Failed to update employee: " + error.message);
+      toast.error("Failed to update employee: " + error.message);
     },
   });
 
@@ -149,12 +143,14 @@ export default function Employees() {
       }
     },
     onSuccess: () => {
-      alert("Employee permanently deleted from database!");
+      // alert("Employee permanently deleted from database!");
+      toast.success("Employee permanently deleted from database!");
       queryClient.invalidateQueries(["employees"]); // Refresh the employee list
     },
     onError: (error) => {
-      console.error("Delete failed:", error);
-      alert("Failed to delete employee: " + error.message);
+      // console.error("Delete failed:", error);
+      // alert("Failed to delete employee: " + error.message);
+      toast.error("Failed to delete employee: " + error.message);
     },
   });
 
@@ -185,6 +181,9 @@ export default function Employees() {
 
   const handleDelete = (empId) => {
     if (
+      toast.success(
+        "Employee Deleted Successfully! This action cannot be undone."
+      ) &&
       window.confirm(
         "Are you sure you want to permanently delete this employee? This action cannot be undone!"
       )
@@ -250,12 +249,13 @@ export default function Employees() {
         createEmployee.mutate(formData);
       }
     } catch (error) {
-      console.error("Form submission error:", error);
-      alert("Error submitting form: " + error.message);
+      // console.error("Form submission error:", error);
+      // alert("Error submitting form: " + error.message)
+      toast.error("Error submitting form: " + error.message);
     }
   };
 
-  if (isLoading) return <div className="p-4">Loading...</div>;
+  if (isLoading) return <Loader />;
   if (error)
     return <div className="p-4 text-red-500">Error: {error.message}</div>;
   if (!data?.employees) return <div className="p-4">No employees found</div>;

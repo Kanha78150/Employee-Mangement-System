@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "../api/axiosInstance";
+import Loader from "../UI/Loader";
 
 export default function Dashboard() {
   const { data, isLoading } = useQuery({
@@ -7,7 +8,7 @@ export default function Dashboard() {
     queryFn: async () => (await api.get("/analytics")).data,
   });
 
-  if (isLoading) return <div className="p-4">Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="p-4">

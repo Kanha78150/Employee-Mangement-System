@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import Loader from "../UI/Loader";
 
 export default function EmployeeTasks() {
   const { user } = useAuth();
@@ -28,7 +30,9 @@ export default function EmployeeTasks() {
   const updateStatus = useMutation({
     mutationFn: async ({ id, completion }) =>
       (await api.put(`/tasks/update/${id}`, { completion })).data,
-    onSuccess: () => queryClient.invalidateQueries(["employeeTasks", user?.id]),
+    onSuccess: () =>
+      toast.success("Task Status Updated SuccessFully") &&
+      queryClient.invalidateQueries(["employeeTasks", user?.id]),
   });
 
   const handleInputChange = (taskId, value) => {
@@ -48,7 +52,7 @@ export default function EmployeeTasks() {
     }
   };
 
-  if (isLoading) return <div className="p-4">Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="p-4">

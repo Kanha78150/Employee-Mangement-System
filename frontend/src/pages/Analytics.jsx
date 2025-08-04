@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import api from "../api/axiosInstance";
+import Loader from "../UI/Loader";
 
 export default function Analytics() {
   // Search state
@@ -31,7 +32,7 @@ export default function Analytics() {
     return title.includes(term) || desc.includes(term) || org.includes(term);
   });
 
-  if (isLoading) return <div className="p-4">Loading tasks...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="p-4">

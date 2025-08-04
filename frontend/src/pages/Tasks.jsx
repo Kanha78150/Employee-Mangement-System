@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import api from "../api/axiosInstance";
+import { toast } from "react-toastify";
+import Loader from "../UI/Loader";
 
 export default function Tasks() {
   const queryClient = useQueryClient();
@@ -27,7 +29,8 @@ export default function Tasks() {
     mutationFn: async (newTask) =>
       (await api.post("/tasks/assign", newTask)).data,
     onSuccess: () => {
-      alert("Task assigned successfully!");
+      // alert("Task assigned successfully!");
+      toast.success("Task assigned successfully!");
       queryClient.invalidateQueries(["employees"]);
       setTask({
         employeeId: "",
@@ -48,7 +51,7 @@ export default function Tasks() {
     assignTask.mutate(task);
   };
 
-  if (empLoading) return <div className="p-4">Loading...</div>;
+  if (empLoading) return <Loader />;
 
   return (
     <div className="p-4">
