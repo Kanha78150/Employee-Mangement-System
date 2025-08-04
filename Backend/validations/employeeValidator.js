@@ -2,7 +2,6 @@ const Joi = require("joi");
 
 exports.createEmployeeSchema = Joi.object({
   name: Joi.string().required(),
-  employeeId: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
   department: Joi.string()
