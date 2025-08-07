@@ -5,14 +5,18 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
-      <h1 className="text-lg font-bold">Employee Dashboard</h1>
+    <div className="bg-gray-800 text-white w-full h-[80px] flex items-center justify-between p-5 sm:w-full md:w-full lg:w-full">
+      <div className="text-2xl font-bold text-white sm:text-4xl md:text-4xl lg:text-4xl">
+        {user.role === "admin" ? (
+          <h3 className="text-center">Admin Portal</h3>
+        ) : (
+          <h3>Employee Portal</h3>
+        )}
+      </div>
+
       <StyledRightSection>
         {user && (
-          <>
-            <span className="mr-4">
-              Logged in as: <strong>{user.role}</strong>
-            </span>
+          <nav className="flex items-center justify-between w-full sm:flex-row">
             <button className="Btn" onClick={logout}>
               <div className="sign">
                 <svg viewBox="0 0 512 512">
@@ -21,7 +25,7 @@ export default function Navbar() {
               </div>
               <div className="text">Logout</div>
             </button>
-          </>
+          </nav>
         )}
       </StyledRightSection>
     </div>
@@ -31,6 +35,8 @@ export default function Navbar() {
 const StyledRightSection = styled.div`
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 
   .Btn {
     display: flex;
@@ -46,6 +52,7 @@ const StyledRightSection = styled.div`
     transition-duration: 0.3s;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
     background-color: rgb(255, 65, 65);
+    margin-top: 0.5rem;
   }
 
   .sign {
@@ -74,7 +81,7 @@ const StyledRightSection = styled.div`
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 600;
     transition-duration: 0.3s;
   }
@@ -100,5 +107,28 @@ const StyledRightSection = styled.div`
 
   .Btn:active {
     transform: translate(2px, 2px);
+  }
+
+  /* 🔽 Responsive styles */
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    .Btn {
+      margin-top: 0.5rem;
+    }
+    .text {
+      font-size: 1em;
+    }
+  }
+
+  @media (max-width: 480px) {
+    span {
+      font-size: 0.9em;
+      text-align: center;
+    }
+
+    .text {
+      font-size: 0.9em;
+    }
   }
 `;
