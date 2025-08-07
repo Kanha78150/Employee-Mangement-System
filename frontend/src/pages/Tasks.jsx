@@ -18,18 +18,15 @@ export default function Tasks() {
     priority: "Medium",
   });
 
-  // Fetch employees (to assign task)
   const { data: employees, isLoading: empLoading } = useQuery({
     queryKey: ["employees"],
     queryFn: async () => (await api.get("/employees")).data,
   });
 
-  // Assign task mutation
   const assignTask = useMutation({
     mutationFn: async (newTask) =>
       (await api.post("/tasks/assign", newTask)).data,
     onSuccess: () => {
-      // alert("Task assigned successfully!");
       toast.success("Task assigned successfully!");
       queryClient.invalidateQueries(["employees"]);
       setTask({
@@ -54,96 +51,123 @@ export default function Tasks() {
   if (empLoading) return <Loader />;
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Assign Task</h2>
+    <div className="p-4 overflow-auto h-screen">
+      <h2 className="text-4xl font-bold mb-6 text-left">Assign Task</h2>
       <form
         onSubmit={handleAssign}
-        className="bg-white p-4 rounded shadow mb-6 grid gap-2"
+        className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded shadow grid gap-4 rounded-xl shadow-lg border border-blue-200 "
       >
-        <select
-          className="border p-2"
-          value={task.employeeId}
-          onChange={(e) => setTask({ ...task, employeeId: e.target.value })}
-          required
-        >
-          <option value="">Select Employee</option>
-          {employees.employees.map((emp) => (
-            <option key={emp._id} value={emp._id}>
-              {emp.name} ({emp.employeeId})
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block mb-1 font-medium">Select Employee</label>
+          <select
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={task.employeeId}
+            onChange={(e) => setTask({ ...task, employeeId: e.target.value })}
+            required
+          >
+            <option value="">Select Employee</option>
+            {employees.employees.map((emp) => (
+              <option key={emp._id} value={emp._id}>
+                {emp.name} ({emp.employeeId})
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <input
-          className="border p-2"
-          placeholder="Title"
-          value={task.title}
-          onChange={(e) => setTask({ ...task, title: e.target.value })}
-          required
-        />
+        <div>
+          <label className="block mb-1 font-medium">Title</label>
+          <input
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            placeholder="Title"
+            value={task.title}
+            onChange={(e) => setTask({ ...task, title: e.target.value })}
+            required
+          />
+        </div>
 
-        <textarea
-          className="border p-2"
-          placeholder="Description"
-          value={task.description}
-          onChange={(e) => setTask({ ...task, description: e.target.value })}
-          required
-        />
+        <div>
+          <label className="block mb-1 font-medium">Description</label>
+          <textarea
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            placeholder="Description"
+            value={task.description}
+            onChange={(e) => setTask({ ...task, description: e.target.value })}
+            required
+          />
+        </div>
 
-        <textarea
-          className="border p-2"
-          placeholder="Remarks (optional)"
-          value={task.reMarks}
-          onChange={(e) => setTask({ ...task, reMarks: e.target.value })}
-        />
+        <div>
+          <label className="block mb-1 font-medium">Remarks (optional)</label>
+          <textarea
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            placeholder="Remarks (optional)"
+            value={task.reMarks}
+            onChange={(e) => setTask({ ...task, reMarks: e.target.value })}
+          />
+        </div>
 
-        <input
-          className="border p-2"
-          type="date"
-          value={task.taskDate}
-          onChange={(e) => setTask({ ...task, taskDate: e.target.value })}
-          required
-        />
+        <div>
+          <label className="block mb-1 font-medium">Task Date</label>
+          <input
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            type="date"
+            value={task.taskDate}
+            onChange={(e) => setTask({ ...task, taskDate: e.target.value })}
+            required
+          />
+        </div>
 
-        <input
-          className="border p-2"
-          type="time"
-          value={task.startTime}
-          onChange={(e) => setTask({ ...task, startTime: e.target.value })}
-          required
-          min="09:00"
-          max="21:00"
-        />
+        <div>
+          <label className="block mb-1 font-medium">Start Time</label>
+          <input
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            type="time"
+            value={task.startTime}
+            onChange={(e) => setTask({ ...task, startTime: e.target.value })}
+            required
+            min="09:00"
+            max="21:00"
+          />
+        </div>
 
-        <input
-          className="border p-2"
-          type="time"
-          value={task.endTime}
-          onChange={(e) => setTask({ ...task, endTime: e.target.value })}
-          required
-          min="09:00"
-          max="21:00"
-        />
+        <div>
+          <label className="block mb-1 font-medium">End Time</label>
+          <input
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            type="time"
+            value={task.endTime}
+            onChange={(e) => setTask({ ...task, endTime: e.target.value })}
+            required
+            min="09:00"
+            max="21:00"
+          />
+        </div>
 
-        <input
-          className="border p-2"
-          placeholder="Organization"
-          value={task.organization}
-          onChange={(e) => setTask({ ...task, organization: e.target.value })}
-          required
-        />
+        <div>
+          <label className="block mb-1 font-medium">Organization</label>
+          <input
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            placeholder="Organization"
+            value={task.organization}
+            onChange={(e) => setTask({ ...task, organization: e.target.value })}
+            required
+          />
+        </div>
 
-        <select
-          className="border p-2"
-          value={task.priority}
-          onChange={(e) => setTask({ ...task, priority: e.target.value })}
-        >
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-        </select>
+        <div>
+          <label className="block mb-1 font-medium">Priority</label>
+          <select
+            className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={task.priority}
+            onChange={(e) => setTask({ ...task, priority: e.target.value })}
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
 
-        <button className="bg-green-500 text-white px-4 py-2 rounded">
+        <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition">
           Assign Task
         </button>
       </form>

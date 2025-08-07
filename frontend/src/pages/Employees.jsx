@@ -4,7 +4,6 @@ import api from "../api/axiosInstance";
 import { toast } from "react-toastify";
 import Loader from "../UI/Loader";
 
-// To Get Proper Date Format
 const formatDate = (dateString) => {
   if (!dateString) return "-";
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -257,7 +256,7 @@ export default function Employees() {
   if (!data?.employees) return <div className="p-4">No employees found</div>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 overflow-auto h-screen">
       <h2 className="text-xl font-bold mb-4">Employees</h2>
 
       <form
@@ -279,19 +278,6 @@ export default function Employees() {
               onChange={handleChange}
             />
           </div>
-          {/* <div>
-            <label className="block mb-2 font-medium text-gray-700">
-              Employee ID
-            </label>
-            <input
-              className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="Employee ID"
-              name="employeeId"
-              value={form.employeeId}
-              onChange={handleChange}
-              required
-            />
-          </div> */}
           <div>
             <label className="block mb-2 font-medium text-gray-700">
               Email
@@ -425,61 +411,88 @@ export default function Employees() {
       </form>
 
       <h3 className="text-lg font-semibold mb-2">Employee List</h3>
-      <table className="w-full bg-white shadow rounded-lg overflow-hidden">
-        <thead>
-          <tr>
-            <th className="p-3 font-semibold">Image</th>
-            <th className="p-3 font-semibold">Name</th>
-            <th className="p-3 font-semibold">Employee ID</th>
-            <th className="p-3 font-semibold">Email</th>
-            <th className="p-3 font-semibold">Department</th>
-            <th className="p-3 font-semibold">Role</th>
-            <th className="p-3 font-semibold">Date of Birth</th>
-            <th className="p-3 font-semibold">Date of Joining</th>
-            <th className="p-3 font-semibold">Gender</th>
-            <th className="p-3 font-semibold">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.employees?.map((emp) => (
-            <tr key={emp._id} className="hover:bg-blue-50 border-b transition">
-              <td className="p-3">
-                {emp.image ? (
-                  <img
-                    src={`${backendUrl}${emp.image}`}
-                    alt={emp.name}
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  "-"
-                )}
-              </td>
-              <td className="p-3">{emp.name}</td>
-              <td className="p-3">{emp.employeeId}</td>
-              <td className="p-3">{emp.email}</td>
-              <td className="p-3">{emp.department}</td>
-              <td className="p-3">{emp.role}</td>
-              <td className="p-3">{formatDate(emp.date_of_birth)}</td>
-              <td className="p-3">{formatDate(emp.date_of_joining)}</td>
-              <td className="p-3">{emp.gender || "-"}</td>
-              <td className="p-3">
-                <button
-                  onClick={() => handleEdit(emp)}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded mr-2"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(emp._id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                >
-                  Delete
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow rounded-lg overflow-hidden">
+          <thead>
+            <tr>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Image
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Name
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Employee ID
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Email
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Department
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Role
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Date of Birth
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Date of Joining
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Gender
+              </th>
+              <th className="p-3 font-semibold text-sm whitespace-nowrap">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data?.employees?.map((emp) => (
+              <tr
+                key={emp._id}
+                className="hover:bg-blue-50 border-b transition"
+              >
+                <td className="p-3 text-sm">
+                  {emp.image ? (
+                    <img
+                      src={`${backendUrl}${emp.image}`}
+                      alt={emp.name}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td className="p-3 text-sm">{emp.name}</td>
+                <td className="p-3 text-sm">{emp.employeeId}</td>
+                <td className="p-3 text-sm">{emp.email}</td>
+                <td className="p-3 text-sm">{emp.department}</td>
+                <td className="p-3 text-sm">{emp.role}</td>
+                <td className="p-3 text-sm">{formatDate(emp.date_of_birth)}</td>
+                <td className="p-3 text-sm">
+                  {formatDate(emp.date_of_joining)}
+                </td>
+                <td className="p-3 text-sm">{emp.gender || "-"}</td>
+                <td className="p-3 text-sm flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleEdit(emp)}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(emp._id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
