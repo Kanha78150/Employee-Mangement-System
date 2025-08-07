@@ -7,9 +7,16 @@ import Loader from "../UI/Loader";
 
 export default function EmployeeTasks() {
   const { user } = useAuth();
+
   const queryClient = useQueryClient();
 
   const [editValues, setEditValues] = useState({});
+
+  const { data: employeeDetails } = useQuery({
+    queryKey: ["employeeDetails", user.id],
+    queryFn: async () => (await api.get(`/employees/${user.id}`)).data,
+    enabled: !!user?.id,
+  });
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -56,7 +63,7 @@ export default function EmployeeTasks() {
   return (
     <div className="p-4">
       <h1 className="text-2xl md:text-3xl font-bold mb-2">
-        Welcome back {user?.name || "Employee"}!
+        Welcome back {employeeDetails?.name || "Employee"}!
       </h1>
       <p className="text-gray-600 mb-6">
         Here you can view all your assigned tasks, track progress, and update
@@ -114,7 +121,7 @@ export default function EmployeeTasks() {
                 <td className="p-2">
                   <button
                     onClick={() => handleUpdateClick(task._id)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm cursor-pointer"
                   >
                     Submit
                   </button>

@@ -23,45 +23,38 @@ export default function Employees() {
     role: "employee",
     image: null,
     date_of_birth: "",
-    date_of_joining: new Date().toISOString().split("T")[0], // Set default to today
+    date_of_joining: new Date().toISOString().split("T")[0],
     gender: "",
   });
 
-  // State to track which employee is being edited
   const [editingEmployee, setEditingEmployee] = useState(null);
 
-  // Fetch employees
   const { data, isLoading, error } = useQuery({
     queryKey: ["employees"],
     queryFn: async () => {
       try {
         const response = await api.get("/employees");
-        // console.log("Fetched employees:", response.data);
         return response.data;
       } catch (error) {
-        // console.error("Fetch error:", error);
         toast.error("Failed to fetch employees: " + error.message);
         throw error;
       }
     },
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    staleTime: 0, // Always fetch fresh data
+    staleTime: 0,
   });
 
-  // Create employee mutation
   const createEmployee = useMutation({
     mutationFn: async (newEmp) => {
       try {
         const response = await api.post("/employees", newEmp);
         return response.data;
       } catch (error) {
-        // Throw a more user-friendly error
         throw new Error(error.response?.data?.message || error.message);
       }
     },
     onSuccess: () => {
-      // alert("Employee created successfully!");
       toast.success("Employee created successfully!");
       queryClient.invalidateQueries(["employees"]);
       setForm({
@@ -77,39 +70,24 @@ export default function Employees() {
       });
     },
     onError: (error) => {
-      // console.error("Create failed:", error);
-      // alert("Failed to create employee: " + error.message);
       toast.error("Failed to create employee: " + error.message);
     },
   });
 
-  // Update employee mutation
   const updateEmployee = useMutation({
     mutationFn: async ({ id, data }) => {
       try {
-        // console.log("Updating employee:", id);
-        // console.log(data);
-
         data.delete("employeeId");
-
-        // console.log("Update data:", Object.fromEntries(data.entries()));
-
         const response = await api.put(`/employees/${id}`, data);
-        // console.log("Update response:", response.data);
         return response.data;
       } catch (error) {
-        // console.error("Update error:", error);
         toast.error("Failed to update employee: " + error.message);
         throw error;
       }
     },
     onSuccess: (data) => {
-      // console.log("Update successful:", data);
-      // alert("Employee updated successfully!");
       toast.success("Employee updated successfully!");
-      // Force refetch
       queryClient.invalidateQueries({ queryKey: ["employees"] });
-      // Reset form
       setEditingEmployee(null);
       setForm({
         name: "",
@@ -128,7 +106,6 @@ export default function Employees() {
     },
   });
 
-  // Delete employee mutation
   const deleteEmployee = useMutation({
     mutationFn: async (id) => {
       try {
@@ -140,13 +117,10 @@ export default function Employees() {
       }
     },
     onSuccess: () => {
-      // alert("Employee permanently deleted from database!");
       toast.success("Employee permanently deleted from database!");
-      queryClient.invalidateQueries(["employees"]); // Refresh the employee list
+      queryClient.invalidateQueries(["employees"]);
     },
     onError: (error) => {
-      // console.error("Delete failed:", error);
-      // alert("Failed to delete employee: " + error.message);
       toast.error("Failed to delete employee: " + error.message);
     },
   });
@@ -165,7 +139,7 @@ export default function Employees() {
     setForm({
       name: emp.name,
       email: emp.email,
-      password: "", // Don't set the password
+      password: "",
       department: emp.department,
       role: emp.role,
       image: null,
@@ -190,8 +164,6 @@ export default function Employees() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate required fields
     const requiredFields = {
       name: "Name",
       email: "Email",
@@ -212,8 +184,6 @@ export default function Employees() {
     }
 
     const formData = new FormData();
-
-    // Add all form fields to formData with proper date formatting
     Object.entries(form).forEach(([key, value]) => {
       if (key === "image") {
         if (value instanceof File) {
@@ -229,11 +199,6 @@ export default function Employees() {
       }
     });
 
-    // Log the data being sent
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
     try {
       if (editingEmployee) {
         updateEmployee.mutate({
@@ -244,8 +209,6 @@ export default function Employees() {
         createEmployee.mutate(formData);
       }
     } catch (error) {
-      // console.error("Form submission error:", error);
-      // alert("Error submitting form: " + error.message)
       toast.error("Error submitting form: " + error.message);
     }
   };
@@ -334,7 +297,7 @@ export default function Employees() {
               value={form.date_of_birth}
               onChange={handleChange}
               required
-              max={new Date().toISOString().split("T")[0]} // Prevent future dates
+              max={new Date().toISOString().split("T")[0]}
               className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             />
           </div>
@@ -382,7 +345,7 @@ export default function Employees() {
             />
           </div>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 mt-8 rounded-lg font-semibold shadow transition w-full md:w-auto">
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 mt-8 rounded-lg font-semibold shadow transition w-full md:w-auto cursor-pointer">
           {editingEmployee ? "Update Employee" : "Create Employee"}
         </button>
         {editingEmployee && (
@@ -403,7 +366,7 @@ export default function Employees() {
                 gender: "",
               });
             }}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 mt-8 rounded-lg font-semibold shadow transition ml-4"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 mt-8 rounded-lg font-semibold shadow transition ml-4 cursor-pointer"
           >
             Cancel
           </button>
@@ -453,7 +416,7 @@ export default function Employees() {
                 key={emp._id}
                 className="hover:bg-blue-50 border-b transition"
               >
-                <td className="p-3 text-sm">
+                <td className="p-3 text-sm cursor-pointer">
                   {emp.image ? (
                     <img
                       src={`${backendUrl}${emp.image}`}
@@ -477,13 +440,13 @@ export default function Employees() {
                 <td className="p-3 text-sm flex flex-wrap gap-2">
                   <button
                     onClick={() => handleEdit(emp)}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded cursor-pointer"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(emp._id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
                   >
                     Delete
                   </button>

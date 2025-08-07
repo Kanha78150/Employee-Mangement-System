@@ -63,7 +63,7 @@ export default function Login() {
           <select
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value })}
-            className="border border-gray-300 p-2 w-full rounded outline-none focus:ring-2 focus:ring-blue-400"
+            className="border border-gray-300 p-2 w-full rounded outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
           >
             <option value="admin">Admin</option>
             <option value="employee">Employee</option>
@@ -126,7 +126,7 @@ export default function Login() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="bg-blue-600 text-white w-full py-2 rounded text-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2 font-semibold"
+          className="bg-blue-600 text-white w-full py-2 rounded text-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2 font-semibold cursor-pointer"
         >
           <FiLogIn className="text-lg" />
           Sign In
