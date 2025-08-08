@@ -63,7 +63,7 @@ export default function Analytics() {
         <input
           type="text"
           className="border p-2 w-full sm:w-64 bg-gray-100 rounded"
-          placeholder="Search by title, employee name, org"
+          placeholder="Search by title, and org"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

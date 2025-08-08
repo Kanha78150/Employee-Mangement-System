@@ -90,7 +90,6 @@ export default function EmployeeTasks() {
 
       <h2 className="text-xl font-semibold mb-4">My Tasks</h2>
       <div className="overflow-x-auto">
-        {/* Filters with responsive layout */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
           <select
             className="border p-2 rounded w-full sm:w-40 bg-gray-100"
@@ -111,7 +110,6 @@ export default function EmployeeTasks() {
           />
         </div>
 
-        {/* Responsive tasks table */}
         <table className="min-w-full table-auto bg-white shadow rounded">
           <thead>
             <tr className="bg-gray-100 text-xs sm:text-sm text-left">
