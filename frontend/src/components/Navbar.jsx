@@ -5,7 +5,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="bg-gray-800 text-white w-full h-[80px] flex items-center justify-between p-5 sm:w-full md:w-full lg:w-full">
+    <div className="bg-gray-800 text-white w-full h-[80px] flex items-center justify-between p-4 sm:w-full md:w-full lg:w-full">
       <div className="text-2xl font-bold text-white sm:text-4xl md:text-4xl lg:text-4xl">
         {user.role === "admin" ? (
           <h3 className="text-center">Admin Portal</h3>

@@ -11,6 +11,8 @@ export default function EmployeeTasks() {
   const queryClient = useQueryClient();
 
   const [editValues, setEditValues] = useState({});
+  const [priorityFilter, setPriorityFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
 
   const { data: employeeDetails } = useQuery({
     queryKey: ["employeeDetails", user.id],
@@ -58,10 +60,24 @@ export default function EmployeeTasks() {
     }
   };
 
+  const filteredTasks = tasks.filter((task) => {
+    const matchesPriority = priorityFilter
+      ? (task.priority ?? "").toLowerCase() === priorityFilter.toLowerCase()
+      : true;
+
+    const matchesDate = dateFilter
+      ? task.taskDate
+        ? new Date(task.taskDate).toISOString().split("T")[0] === dateFilter
+        : false
+      : true;
+
+    return matchesPriority && matchesDate;
+  });
+
   if (isLoading) return <Loader />;
 
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-full overflow-x-hidden">
       <h1 className="text-2xl md:text-3xl font-bold mb-2">
         Welcome back {employeeDetails?.name || "Employee"}!
       </h1>
@@ -73,31 +89,72 @@ export default function EmployeeTasks() {
       </p>
 
       <h2 className="text-xl font-semibold mb-4">My Tasks</h2>
-
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white shadow rounded">
+        {/* Filters with responsive layout */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+          <select
+            className="border p-2 rounded w-full sm:w-40 bg-gray-100"
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+          >
+            <option value="">All Priorities</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+
+          <input
+            type="date"
+            className="border p-2 rounded w-full sm:w-40 bg-gray-100"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+          />
+        </div>
+
+        {/* Responsive tasks table */}
+        <table className="min-w-full table-auto bg-white shadow rounded">
           <thead>
-            <tr className="bg-gray-100 text-sm text-left">
-              <th className="p-2 whitespace-nowrap">Title</th>
-              <th className="p-2 whitespace-nowrap">Description</th>
+            <tr className="bg-gray-100 text-xs sm:text-sm text-left">
+              <th className="p-2 whitespace-nowrap max-w-[120px]">Title</th>
+              <th className="p-2 whitespace-nowrap max-w-[150px] hidden sm:table-cell">
+                Description
+              </th>
               <th className="p-2 whitespace-nowrap">Start Time</th>
               <th className="p-2 whitespace-nowrap">End Time</th>
-              <th className="p-2 whitespace-nowrap">Task Date</th>
-              <th className="p-2 whitespace-nowrap">Organization</th>
+              <th className="p-2 whitespace-nowrap hidden md:table-cell">
+                Task Date
+              </th>
+              <th className="p-2 whitespace-nowrap hidden lg:table-cell">
+                Organization
+              </th>
               <th className="p-2 whitespace-nowrap">Priority</th>
               <th className="p-2 whitespace-nowrap">Completion (%)</th>
               <th className="p-2 whitespace-nowrap">Actions</th>
             </tr>
           </thead>
-          <tbody className="text-sm">
-            {tasks.map((task) => (
+          <tbody className="text-xs sm:text-sm">
+            {filteredTasks.map((task) => (
               <tr key={task._id} className="border-b hover:bg-gray-50">
-                <td className="p-2">{task.title}</td>
-                <td className="p-2">{task.description}</td>
+                <td className="p-2 max-w-[120px] truncate" title={task.title}>
+                  {task.title}
+                </td>
+                <td
+                  className="p-2 max-w-[150px] truncate hidden sm:table-cell"
+                  title={task.description}
+                >
+                  {task.description}
+                </td>
                 <td className="p-2">{task.startTime}</td>
                 <td className="p-2">{task.endTime}</td>
-                <td className="p-2">{formatDate(task.taskDate)}</td>
-                <td className="p-2">{task.organization}</td>
+                <td className="p-2 hidden md:table-cell">
+                  {formatDate(task.taskDate)}
+                </td>
+                <td
+                  className="p-2 hidden lg:table-cell truncate max-w-[150px]"
+                  title={task.organization}
+                >
+                  {task.organization}
+                </td>
                 <td className="p-2">{task.priority}</td>
                 <td className="p-2">
                   <input
@@ -114,14 +171,14 @@ export default function EmployeeTasks() {
                     onChange={(e) =>
                       handleInputChange(task._id, e.target.value)
                     }
-                    className="border p-1 w-20 rounded text-sm"
+                    className="border p-1 w-16 sm:w-20 rounded text-sm"
                     placeholder="0-100%"
                   />
                 </td>
                 <td className="p-2">
                   <button
                     onClick={() => handleUpdateClick(task._id)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm cursor-pointer"
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs sm:text-sm cursor-pointer w-full sm:w-auto"
                   >
                     Submit
                   </button>

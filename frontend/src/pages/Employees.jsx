@@ -219,18 +219,18 @@ export default function Employees() {
   if (!data?.employees) return <div className="p-4">No employees found</div>;
 
   return (
-    <div className="p-4 overflow-auto h-screen">
-      <h2 className="text-xl font-bold mb-4">Employees</h2>
+    <div className="p-2 sm:p-4 max-w-screen-lg mx-auto w-full">
+      <h2 className="text-lg sm:text-xl font-bold mb-2 sm:mb-4">Employees</h2>
 
       <form
         onSubmit={handleSubmit}
         encType="multipart/form-data"
-        className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl shadow-lg mb-8 border border-blue-200"
+        className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 sm:p-8 rounded-xl shadow-lg mb-8 border border-blue-200"
       >
-        <h3 className="text-2xl font-bold mb-6 text-blue-700">
+        <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-blue-700">
           {editingEmployee ? "Edit Employee" : "Create Employee"}
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div>
             <label className="block mb-2 font-medium text-gray-700">Name</label>
             <input
@@ -345,38 +345,41 @@ export default function Employees() {
             />
           </div>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 mt-8 rounded-lg font-semibold shadow transition w-full md:w-auto cursor-pointer">
-          {editingEmployee ? "Update Employee" : "Create Employee"}
-        </button>
-        {editingEmployee && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditingEmployee(null);
-              setForm({
-                name: "",
-                employeeId: "",
-                email: "",
-                password: "",
-                department: "Technical",
-                role: "employee",
-                image: null,
-                date_of_birth: "",
-                date_of_joining: new Date().toISOString().split("T")[0],
-                gender: "",
-              });
-            }}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 mt-8 rounded-lg font-semibold shadow transition ml-4 cursor-pointer"
-          >
-            Cancel
+
+        <div className="flex flex-col sm:flex-row gap-4 mt-6">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow transition w-full sm:w-auto cursor-pointer">
+            {editingEmployee ? "Update Employee" : "Create Employee"}
           </button>
-        )}
+          {editingEmployee && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingEmployee(null);
+                setForm({
+                  name: "",
+                  employeeId: "",
+                  email: "",
+                  password: "",
+                  department: "Technical",
+                  role: "employee",
+                  image: null,
+                  date_of_birth: "",
+                  date_of_joining: new Date().toISOString().split("T")[0],
+                  gender: "",
+                });
+              }}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold shadow transition w-full sm:w-auto cursor-pointer"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
-      <h3 className="text-lg font-semibold mb-2">Employee List</h3>
-      <div className="overflow-x-auto">
+      <h3 className="text-base sm:text-lg font-semibold mb-2">Employee List</h3>
+      <div className="overflow-x-auto w-full">
         <table className="min-w-full bg-white shadow rounded-lg overflow-hidden">
-          <thead>
+          <thead className="hidden sm:table-header-group">
             <tr>
               <th className="p-3 font-semibold text-sm whitespace-nowrap">
                 Image
@@ -414,9 +417,10 @@ export default function Employees() {
             {data?.employees?.map((emp) => (
               <tr
                 key={emp._id}
-                className="hover:bg-blue-50 border-b transition"
+                className="hover:bg-blue-50 border-b transition md:table-row flex flex-col md:flex-row mb-4 md:mb-0 bg-white md:bg-transparent rounded-lg md:rounded-none shadow md:shadow-none md:border-none"
               >
-                <td className="p-3 text-sm cursor-pointer">
+                {/* Image */}
+                <td className="p-3 text-sm cursor-pointer flex items-center justify-center md:table-cell">
                   {emp.image ? (
                     <img
                       src={`${backendUrl}${emp.image}`}
@@ -427,17 +431,57 @@ export default function Employees() {
                     "-"
                   )}
                 </td>
-                <td className="p-3 text-sm">{emp.name}</td>
-                <td className="p-3 text-sm">{emp.employeeId}</td>
-                <td className="p-3 text-sm">{emp.email}</td>
-                <td className="p-3 text-sm">{emp.department}</td>
-                <td className="p-3 text-sm">{emp.role}</td>
-                <td className="p-3 text-sm">{formatDate(emp.date_of_birth)}</td>
-                <td className="p-3 text-sm">
+
+                {/* Name */}
+                <td className="p-3 text-sm md:table-cell">
+                  <span className="md:hidden font-semibold">Name: </span>
+                  {emp.name}
+                </td>
+
+                {/* Employee ID */}
+                <td className="p-3 text-sm md:table-cell">
+                  <span className="md:hidden font-semibold">ID: </span>
+                  {emp.employeeId}
+                </td>
+
+                {/* Email */}
+                <td className="p-3 text-sm md:table-cell break-all">
+                  <span className="md:hidden font-semibold">Email: </span>
+                  {emp.email}
+                </td>
+
+                {/* Department */}
+                <td className="p-3 text-sm md:table-cell">
+                  <span className="md:hidden font-semibold">Dept: </span>
+                  {emp.department}
+                </td>
+
+                {/* Role */}
+                <td className="p-3 text-sm md:table-cell">
+                  <span className="md:hidden font-semibold">Role: </span>
+                  {emp.role}
+                </td>
+
+                {/* DOB */}
+                <td className="p-3 text-sm md:table-cell">
+                  <span className="md:hidden font-semibold">DOB: </span>
+                  {formatDate(emp.date_of_birth)}
+                </td>
+
+                {/* DOJ */}
+                <td className="p-3 text-sm md:table-cell">
+                  <span className="md:hidden font-semibold">Joined: </span>
                   {formatDate(emp.date_of_joining)}
                 </td>
-                <td className="p-3 text-sm">{emp.gender || "-"}</td>
-                <td className="p-3 text-sm flex flex-wrap gap-2">
+
+                {/* Gender */}
+                <td className="p-3 text-sm md:table-cell">
+                  <span className="md:hidden font-semibold">Gender: </span>
+                  {emp.gender || "-"}
+                </td>
+
+                {/* Actions */}
+                <td className="p-3 text-sm flex gap-2 md:table-cell">
                   <button
                     onClick={() => handleEdit(emp)}
                     className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded cursor-pointer"
