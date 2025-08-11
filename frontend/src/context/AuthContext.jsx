@@ -4,8 +4,14 @@ import getUserFromToken from "../utils/getUserFromToken";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [user, setUser] = useState(token ? getUserFromToken(token) : null);
+  const [token, setToken] = useState(() => {
+    const storedToken = localStorage.getItem("token");
+    // ✅ Only return valid string tokens
+    return storedToken && typeof storedToken === "string" ? storedToken : null;
+  });
+  const [user, setUser] = useState(() =>
+    token ? getUserFromToken(token) : null
+  );
 
   const login = (newToken) => {
     localStorage.setItem("token", newToken);

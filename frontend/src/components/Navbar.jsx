@@ -1,134 +1,79 @@
 import { useAuth } from "../context/AuthContext";
-import styled from "styled-components";
+import { FiLogOut, FiUser, FiBell } from "react-icons/fi";
+import { useState } from "react";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const [showProfile, setShowProfile] = useState(false);
 
   return (
-    <div className="bg-gray-800 text-white w-full h-[80px] flex items-center justify-between p-4 sm:w-full md:w-full lg:w-full">
-      <div className="text-2xl font-bold text-white sm:text-4xl md:text-4xl lg:text-4xl">
-        {user.role === "admin" ? (
-          <h3 className="text-center">Admin Portal</h3>
-        ) : (
-          <h3>Employee Portal</h3>
-        )}
+    <nav className="bg-white shadow-lg border-b border-gray-200 h-16 flex items-center justify-between px-6">
+      {/* Left Section - Title */}
+      <div className="flex items-center space-x-4">
+        {/* Add left padding on mobile to avoid overlap with hamburger menu */}
+        <h1 className="text-xl font-bold text-gray-800 md:ml-0 ml-12">
+          {user?.role === "admin" ? "Admin Dashboard" : "Employee Portal"}
+        </h1>
       </div>
 
-      <StyledRightSection>
-        {user && (
-          <nav className="flex items-center justify-between w-full sm:flex-row">
-            <button className="Btn" onClick={logout}>
-              <div className="sign">
-                <svg viewBox="0 0 512 512">
-                  <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z" />
-                </svg>
+      {/* Right Section - User Menu */}
+      <div className="flex items-center space-x-4">
+        {/* Notifications */}
+        <button className="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+          <FiBell className="w-5 h-5" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
+
+        {/* User Profile Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowProfile(!showProfile)}
+            className="flex items-center space-x-3 p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+              <FiUser className="w-4 h-4 text-white" />
+            </div>
+            <div className="hidden md:block text-left">
+              <p className="text-sm font-medium text-gray-900 capitalize">
+                {user?.role}
+              </p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
+            </div>
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {/* Dropdown Menu */}
+          {showProfile && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+              <div className="px-4 py-2 border-b border-gray-100">
+                <p className="text-sm font-medium text-gray-900 capitalize">
+                  {user?.role}
+                </p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
-              <div className="text">Logout</div>
-            </button>
-          </nav>
-        )}
-      </StyledRightSection>
-    </div>
+              <button
+                onClick={logout}
+                className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <FiLogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 }
-
-const StyledRightSection = styled.div`
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-
-  .Btn {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    width: 45px;
-    height: 45px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition-duration: 0.3s;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
-    background-color: rgb(255, 65, 65);
-    margin-top: 0.5rem;
-  }
-
-  .sign {
-    width: 100%;
-    transition-duration: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .sign svg {
-    width: 17px;
-  }
-
-  .sign svg path {
-    fill: white;
-  }
-
-  .text {
-    position: absolute;
-    right: 0;
-    height: 100%;
-    width: 0%;
-    opacity: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.1em;
-    font-weight: 600;
-    transition-duration: 0.3s;
-  }
-
-  .Btn:hover {
-    width: 125px;
-    border-radius: 40px;
-    transition-duration: 0.3s;
-  }
-
-  .Btn:hover .sign {
-    width: 30%;
-    transition-duration: 0.3s;
-    padding-left: 10px;
-  }
-
-  .Btn:hover .text {
-    opacity: 1;
-    width: 70%;
-    transition-duration: 0.3s;
-    padding-right: 50px;
-  }
-
-  .Btn:active {
-    transform: translate(2px, 2px);
-  }
-
-  /* 🔽 Responsive styles */
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    .Btn {
-      margin-top: 0.5rem;
-    }
-    .text {
-      font-size: 1em;
-    }
-  }
-
-  @media (max-width: 480px) {
-    span {
-      font-size: 0.9em;
-      text-align: center;
-    }
-
-    .text {
-      font-size: 0.9em;
-    }
-  }
-`;

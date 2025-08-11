@@ -36,72 +36,131 @@ export default function Sidebar() {
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
-    <div className="md:flex">
-      {/* Hamburger Icon (mobile only and visible only when sidebar is closed) */}
+    <>
+      {/* Mobile Menu Button */}
       {!isOpen && (
-        <div className="md:hidden p-4 z-50 relative">
-          <button onClick={toggleSidebar}>
-            <VscThreeBars className="text-3xl" />
-          </button>
-        </div>
+        <button
+          className="md:hidden fixed top-4 left-4 z-50 p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
+          onClick={toggleSidebar}
+        >
+          <VscThreeBars className="text-xl" />
+        </button>
+      )}
+
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
+          onClick={() => setIsOpen(false)}
+        />
       )}
 
       {/* Sidebar Panel */}
       <div
         ref={sidebarRef}
-        className={`bg-gray-100 w-60 min-h-screen p-4 space-y-4 transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+        className={`bg-gradient-to-b from-gray-900 to-gray-800 w-64 min-h-screen transform transition-all duration-300 ease-in-out shadow-2xl
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
         md:translate-x-0 fixed md:static top-0 left-0 z-40`}
       >
-        <div className="md:hidden text-right">
-          <button
-            onClick={() => setIsOpen(false)}
-            className="text-gray-500 hover:text-black text-5xl"
-          >
-            &times;
-          </button>
+        {/* Header */}
+        <div className="p-6 border-b border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                <FiGrid className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-white font-bold text-lg">Dashboard</h2>
+                <p className="text-gray-400 text-sm capitalize">{user?.role}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="md:hidden text-gray-400 hover:text-white transition-colors"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {user?.role === "admin" && (
-          <>
-            <Link
-              className="block p-3 hover:bg-gray-200 text-lg"
-              to="/dashboard"
-            >
-              <FiGrid className="inline mr-3 text-2xl" />
-              Dashboard
-            </Link>
-            <Link
-              className="block p-3 hover:bg-gray-200 text-lg"
-              to="/employees"
-            >
-              <FaAddressBook className="inline mr-3 text-2xl" />
-              Employees
-            </Link>
-            <Link className="block p-3 hover:bg-gray-200 text-lg" to="/tasks">
-              <SiGoogletasks className="inline mr-3 text-2xl" />
-              Tasks
-            </Link>
-            <Link
-              className="block p-3 hover:bg-gray-200 text-lg"
-              to="/analytics"
-            >
-              <TbPresentationAnalytics className="inline mr-3 text-2xl" />
-              Analytics
-            </Link>
-          </>
-        )}
+        {/* Navigation */}
+        <nav className="p-4 space-y-2">
+          {user?.role === "admin" && (
+            <>
+              <Link
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 text-gray-300 hover:text-white ${
+                  location.pathname === "/dashboard"
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : ""
+                }`}
+                to="/dashboard"
+              >
+                <FiGrid className="w-5 h-5" />
+                <span className="font-medium">Dashboard</span>
+              </Link>
+              <Link
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 text-gray-300 hover:text-white ${
+                  location.pathname === "/employees"
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : ""
+                }`}
+                to="/employees"
+              >
+                <FaAddressBook className="w-5 h-5" />
+                <span className="font-medium">Employees</span>
+              </Link>
+              <Link
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 text-gray-300 hover:text-white ${
+                  location.pathname === "/tasks"
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : ""
+                }`}
+                to="/tasks"
+              >
+                <SiGoogletasks className="w-5 h-5" />
+                <span className="font-medium">Tasks</span>
+              </Link>
+              <Link
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 text-gray-300 hover:text-white ${
+                  location.pathname === "/analytics"
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : ""
+                }`}
+                to="/analytics"
+              >
+                <TbPresentationAnalytics className="w-5 h-5" />
+                <span className="font-medium">Analytics</span>
+              </Link>
+            </>
+          )}
 
-        {user?.role === "employee" && (
-          <Link
-            className="block p-3 hover:bg-gray-200 text-lg"
-            to="/employee/tasks"
-          >
-            <BiTask className="inline mr-3 text-2xl" />
-            My Tasks
-          </Link>
-        )}
+          {user?.role === "employee" && (
+            <Link
+              className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:bg-gray-700 text-gray-300 hover:text-white ${
+                location.pathname === "/employee/tasks"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : ""
+              }`}
+              to="/employee/tasks"
+            >
+              <BiTask className="w-5 h-5" />
+              <span className="font-medium">My Tasks</span>
+            </Link>
+          )}
+        </nav>
       </div>
-    </div>
+    </>
   );
 }
