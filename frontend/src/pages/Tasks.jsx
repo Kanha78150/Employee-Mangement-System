@@ -14,8 +14,6 @@ import {
   FiPlus,
   FiSend,
   FiEdit3,
-  FiTrash2,
-  FiEye,
 } from "react-icons/fi";
 
 export default function Tasks() {
@@ -38,18 +36,20 @@ export default function Tasks() {
     queryFn: async () => (await api.get("/employees")).data,
   });
 
-  const { data: allTasks = [], isLoading: tasksLoading } = useQuery({
+  // Get task statistics
+  const { data: allTasks = [] } = useQuery({
     queryKey: ["allTasks"],
     queryFn: async () => (await api.get("/tasks")).data,
   });
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  // Calculate stats from tasks data
+  const taskStats = {
+    totalTasks: allTasks.length,
+    completedTasks: allTasks.filter((task) => task.completion === 100).length,
+    inProgressTasks: allTasks.filter(
+      (task) => task.completion > 0 && task.completion < 100
+    ).length,
+    pendingTasks: allTasks.filter((task) => task.completion === 0).length,
   };
 
   const assignTask = useMutation({
@@ -58,6 +58,7 @@ export default function Tasks() {
     onSuccess: () => {
       toast.success("Task assigned successfully!");
       queryClient.invalidateQueries(["employees"]);
+      queryClient.invalidateQueries(["allTasks"]);
       setTask({
         employeeId: "",
         title: "",
@@ -69,6 +70,7 @@ export default function Tasks() {
         organization: "",
         priority: "Medium",
       });
+      setShowForm(false); // Hide form after successful submission
     },
   });
 
@@ -77,7 +79,7 @@ export default function Tasks() {
     assignTask.mutate(task);
   };
 
-  if (empLoading || tasksLoading) {
+  if (empLoading) {
     return (
       <div className="p-4 lg:p-8 space-y-8 bg-gray-50 min-h-screen">
         <div className="space-y-4">
@@ -116,9 +118,30 @@ export default function Tasks() {
       {/* Task Assignment Form */}
       {showForm && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">
-            Assign New Task
-          </h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Assign New Task
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
           <form
             onSubmit={handleAssign}
             className="grid grid-cols-1 lg:grid-cols-2 gap-6"
@@ -305,182 +328,179 @@ export default function Tasks() {
         </div>
       )}
 
-      {/* Assigned Tasks Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Assigned Tasks
-          </h3>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <FiTarget className="w-4 h-4" />
-            <span>{allTasks.length} tasks assigned</span>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-lg bg-blue-50">
+              <FiTarget className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600">Total Tasks</h3>
+              <p className="text-2xl font-bold text-gray-900">
+                {taskStats.totalTasks}
+              </p>
+            </div>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center space-x-2">
-                    <FiTarget className="w-4 h-4" />
-                    <span>Task Details</span>
-                  </div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center space-x-2">
-                    <FiUser className="w-4 h-4" />
-                    <span>Assigned To</span>
-                  </div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center space-x-2">
-                    <FiClock className="w-4 h-4" />
-                    <span>Schedule</span>
-                  </div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Priority & Progress
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {allTasks.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center">
-                    <div className="text-gray-500">
-                      <FiTarget className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p className="text-lg font-medium">
-                        No tasks assigned yet
-                      </p>
-                      <p className="text-sm">
-                        Start by assigning your first task to an employee
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                allTasks.map((task) => (
-                  <tr
-                    key={task._id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    {/* Task Details */}
-                    <td className="px-6 py-4">
-                      <div className="space-y-2">
-                        <div className="text-sm font-medium text-gray-900">
-                          {task.title}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {task.description}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            {task.organization}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
 
-                    {/* Assigned To */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex-shrink-0">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
-                            <FiUser className="w-5 h-5 text-white" />
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {task.employee?.name || "Unassigned"}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {task.employee?.employeeId || "No ID"}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-lg bg-green-50">
+              <FiUser className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600">
+                Active Employees
+              </h3>
+              <p className="text-2xl font-bold text-gray-900">
+                {employees?.employees?.length || 0}
+              </p>
+            </div>
+          </div>
+        </div>
 
-                    {/* Schedule */}
-                    <td className="px-6 py-4">
-                      <div className="space-y-1">
-                        <div className="text-sm text-gray-900">
-                          <span className="text-gray-500">Date:</span>{" "}
-                          {formatDate(task.taskDate)}
-                        </div>
-                        <div className="text-sm text-gray-900">
-                          <span className="text-gray-500">Time:</span>{" "}
-                          {task.startTime} - {task.endTime}
-                        </div>
-                      </div>
-                    </td>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-lg bg-purple-50">
+              <FiClock className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600">
+                Completion Rate
+              </h3>
+              <p className="text-2xl font-bold text-gray-900">
+                {taskStats.totalTasks > 0
+                  ? Math.round(
+                      (taskStats.completedTasks / taskStats.totalTasks) * 100
+                    )
+                  : 0}
+                %
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                    {/* Priority & Progress */}
-                    <td className="px-6 py-4">
-                      <div className="space-y-2">
-                        <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            task.priority === "High"
-                              ? "bg-red-100 text-red-800"
-                              : task.priority === "Medium"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-green-100 text-green-800"
-                          }`}
-                        >
-                          {task.priority}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-900">
-                            {task.completion || 0}%
-                          </span>
-                          <div className="w-16 bg-gray-200 rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full transition-all duration-300 ${
-                                (task.completion || 0) === 100
-                                  ? "bg-green-500"
-                                  : (task.completion || 0) > 50
-                                  ? "bg-blue-500"
-                                  : (task.completion || 0) > 0
-                                  ? "bg-yellow-500"
-                                  : "bg-gray-400"
-                              }`}
-                              style={{ width: `${task.completion || 0}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
+      {/* Task Assignment Tips */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          💡 Task Assignment Tips
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                <span className="text-xs font-medium text-blue-600">1</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Clear Task Titles</h4>
+                <p className="text-sm text-gray-600">
+                  Use descriptive titles that clearly indicate what needs to be
+                  done
+                </p>
+              </div>
+            </div>
 
-                    {/* Actions */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          className="inline-flex items-center p-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                          title="View Details"
-                        >
-                          <FiEye className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="inline-flex items-center p-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
-                          title="Edit Task"
-                        >
-                          <FiEdit3 className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="inline-flex items-center p-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
-                          title="Delete Task"
-                        >
-                          <FiTrash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
+                <span className="text-xs font-medium text-green-600">2</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">
+                  Set Realistic Deadlines
+                </h4>
+                <p className="text-sm text-gray-600">
+                  Consider employee workload and task complexity when setting
+                  dates
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mt-0.5">
+                <span className="text-xs font-medium text-purple-600">3</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Priority Levels</h4>
+                <p className="text-sm text-gray-600">
+                  Use High priority sparingly for truly urgent tasks
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center mt-0.5">
+                <span className="text-xs font-medium text-yellow-600">4</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">
+                  Detailed Descriptions
+                </h4>
+                <p className="text-sm text-gray-600">
+                  Provide context, requirements, and expected outcomes
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
+                <span className="text-xs font-medium text-red-600">5</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Follow Up</h4>
+                <p className="text-sm text-gray-600">
+                  Check progress regularly and provide support when needed
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                <span className="text-xs font-medium text-indigo-600">6</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Track Analytics</h4>
+                <p className="text-sm text-gray-600">
+                  Monitor task completion rates and team performance
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          🚀 Quick Actions
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a
+            href="/analytics"
+            className="flex items-center justify-center space-x-2 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+          >
+            <FiTarget className="w-5 h-5 text-blue-600" />
+            <span className="font-medium text-blue-900">View All Tasks</span>
+          </a>
+
+          <a
+            href="/employees"
+            className="flex items-center justify-center space-x-2 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
+          >
+            <FiUser className="w-5 h-5 text-green-600" />
+            <span className="font-medium text-green-900">Manage Employees</span>
+          </a>
+
+          <a
+            href="/dashboard"
+            className="flex items-center justify-center space-x-2 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
+          >
+            <FiMapPin className="w-5 h-5 text-purple-600" />
+            <span className="font-medium text-purple-900">Dashboard</span>
+          </a>
         </div>
       </div>
     </div>

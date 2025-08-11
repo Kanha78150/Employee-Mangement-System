@@ -126,7 +126,7 @@ export default function Employees() {
         const response = await api.delete(`/employees/${id}`);
         return response.data;
       } catch (error) {
-        console.error("Delete error:", error);
+        // Error handling removed for production
         throw error;
       }
     },
@@ -150,7 +150,7 @@ export default function Employees() {
 
   const handleEdit = (emp) => {
     setEditingEmployee(emp._id);
-    setShowForm(true); // ✅ Open the form when editing
+    setShowForm(true);
     setForm({
       name: emp.name,
       email: emp.email,
@@ -344,9 +344,44 @@ export default function Employees() {
       {/* Employee Form */}
       {showForm && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">
-            {editingEmployee ? "Edit Employee" : "Add New Employee"}
-          </h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-900">
+              {editingEmployee ? "Edit Employee" : "Add New Employee"}
+            </h3>
+            <button
+              type="button"
+              onClick={() => {
+                setShowForm(false);
+                setEditingEmployee(null);
+                setForm({
+                  name: "",
+                  email: "",
+                  password: "",
+                  department: "Technical",
+                  role: "employee",
+                  image: null,
+                  date_of_birth: "",
+                  date_of_joining: new Date().toISOString().split("T")[0],
+                  gender: "",
+                });
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
           <form onSubmit={handleSubmit} encType="multipart/form-data">
             <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-blue-700">
               {editingEmployee ? "Edit Employee" : "Create Employee"}

@@ -32,13 +32,9 @@ api.interceptors.response.use(
     const endTime = new Date();
     const duration = endTime - response.config.metadata.startTime;
 
-    // Log successful requests in development
+    // Log successful requests in development only
     if (import.meta.env.VITE_NODE_ENV === "development") {
-      console.log(
-        `✅ ${response.config.method?.toUpperCase()} ${response.config.url} - ${
-          response.status
-        } (${duration}ms)`
-      );
+      // Only log in development - removed for production
     }
 
     return response;
@@ -49,14 +45,10 @@ api.interceptors.response.use(
       ? new Date() - error.config.metadata.startTime
       : "unknown";
 
-    // Log error details
-    console.error(`❌ API Error (${duration}ms):`, {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      message: error.message,
-      data: error.response?.data,
-    });
+    // Log error details only in development
+    if (import.meta.env.VITE_NODE_ENV === "development") {
+      // Error logging removed for production
+    }
 
     // Handle different types of errors
     if (error.response) {
@@ -117,8 +109,7 @@ export const handleApiError = (error, customMessage) => {
     toast.error(customMessage);
   }
 
-  // Log error for debugging
-  console.error("API Error:", error);
+  // Error logging removed for production
 
   return error.response?.data || { message: "An unexpected error occurred" };
 };

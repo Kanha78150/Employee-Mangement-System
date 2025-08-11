@@ -98,3 +98,32 @@ Desktop.ini
 # Uploads (if you want to ignore uploaded files)
 Backend/uploads/*
 !Backend/uploads/.gitkeep
+
+# Deployment platforms
+.vercel
+.railway
+.netlify
+
+# Additional security files
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Additional build directories
+.vite/
+frontend/.vite/
+backend/logs/
+
+# Documentation files (optional - don't push if not needed)
+DEPLOYMENT_GUIDE.md
+PRODUCTION_CHECKLIST.md
+deploy.md
+scripts/remove-console-logs.js
+scripts/production-setup.sh

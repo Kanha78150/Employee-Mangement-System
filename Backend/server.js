@@ -27,21 +27,20 @@ const requiredEnvVars = ["MONGO_URI", "JWT_SECRET"];
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-  console.error(
-    "❌ Missing required environment variables:",
-    missingEnvVars.join(", ")
-  );
-  console.error(
-    "Please check your .env file and ensure all required variables are set."
-  );
+  logger.error("Missing required environment variables", {
+    missingVars: missingEnvVars,
+    message:
+      "Please check your .env file and ensure all required variables are set.",
+  });
   process.exit(1);
 }
 
 // ✅ Validate JWT Secret strength
 if (process.env.JWT_SECRET.length < 32) {
-  console.warn(
-    "⚠️ JWT_SECRET should be at least 32 characters long for security"
-  );
+  logger.warn("JWT_SECRET should be at least 32 characters long for security", {
+    currentLength: process.env.JWT_SECRET.length,
+    recommendedLength: 32,
+  });
 }
 
 const app = express();

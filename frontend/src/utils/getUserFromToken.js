@@ -3,14 +3,14 @@ import { jwtDecode } from "jwt-decode";
 export default function getUserFromToken(token) {
   // ✅ Check if token exists and is a string
   if (!token || typeof token !== "string") {
-    console.warn("Invalid token provided to getUserFromToken:", token);
+    // Invalid token - logging removed for production
     return null;
   }
 
   try {
     return jwtDecode(token);
   } catch (error) {
-    console.error("Error decoding JWT:", error);
+    // JWT decode error - logging removed for production
     return null;
   }
 }

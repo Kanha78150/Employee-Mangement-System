@@ -1,5 +1,5 @@
-import React from 'react';
-import { MdError, MdRefresh } from 'react-icons/md';
+import React from "react";
+import { MdError, MdRefresh } from "react-icons/md";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -13,12 +13,14 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log the error to console and potentially to a logging service
-    console.error('Error Boundary caught an error:', error, errorInfo);
-    
+    // Log the error only in development
+    if (process.env.NODE_ENV === "development") {
+      // Error logging removed for production
+    }
+
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     });
 
     // You could also log the error to an error reporting service here
@@ -41,13 +43,14 @@ class ErrorBoundary extends React.Component {
             <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <MdError className="w-8 h-8 text-red-600" />
             </div>
-            
+
             <h1 className="text-xl font-bold text-gray-900 mb-2">
               Oops! Something went wrong
             </h1>
-            
+
             <p className="text-gray-600 mb-6">
-              We're sorry, but something unexpected happened. Please try refreshing the page or contact support if the problem persists.
+              We're sorry, but something unexpected happened. Please try
+              refreshing the page or contact support if the problem persists.
             </p>
 
             <div className="space-y-3">
@@ -58,7 +61,7 @@ class ErrorBoundary extends React.Component {
                 <MdRefresh className="w-4 h-4 mr-2" />
                 Reload Page
               </button>
-              
+
               <button
                 onClick={this.handleReset}
                 className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors"
@@ -67,7 +70,7 @@ class ErrorBoundary extends React.Component {
               </button>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mt-6 text-left">
                 <summary className="cursor-pointer text-sm font-medium text-gray-700 mb-2">
                   Error Details (Development Only)
