@@ -10,7 +10,7 @@ const employeeSchema = new mongoose.Schema({
   image: String,
   isDeleted: { type: Boolean, default: false },
 
-  // Add these new fields to the employeeSchema
+  // Personal Information
   date_of_birth: {
     type: Date,
     required: [true, "Date of birth is required"],
@@ -31,6 +31,32 @@ const employeeSchema = new mongoose.Schema({
     required: [true, "Gender is required"],
     enum: ["Male", "Female", "Other"],
     trim: true,
+  },
+
+  // New Fields
+  contactNumber: {
+    type: String,
+    required: [true, "Contact number is required"],
+    trim: true,
+    validate: {
+      validator: function (value) {
+        // Allow various phone number formats
+        return /^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/[\s\-\(\)]/g, ""));
+      },
+      message: "Please enter a valid contact number",
+    },
+  },
+  designation: {
+    type: String,
+    required: [true, "Designation is required"],
+    trim: true,
+    maxlength: [100, "Designation cannot exceed 100 characters"],
+  },
+  location: {
+    type: String,
+    required: [true, "Location is required"],
+    trim: true,
+    maxlength: [200, "Location cannot exceed 200 characters"],
   },
 });
 

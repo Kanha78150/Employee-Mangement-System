@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../api/axiosInstance";
 import { toast } from "react-toastify";
 import LoadingSpinner, { SkeletonCard } from "../components/LoadingSpinner";
@@ -478,29 +479,29 @@ export default function Tasks() {
           🚀 Quick Actions
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a
-            href="/analytics"
+          <Link
+            to="/analytics"
             className="flex items-center justify-center space-x-2 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
           >
             <FiTarget className="w-5 h-5 text-blue-600" />
             <span className="font-medium text-blue-900">View All Tasks</span>
-          </a>
+          </Link>
 
-          <a
-            href="/employees"
+          <Link
+            to="/employees"
             className="flex items-center justify-center space-x-2 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
           >
             <FiUser className="w-5 h-5 text-green-600" />
             <span className="font-medium text-green-900">Manage Employees</span>
-          </a>
+          </Link>
 
-          <a
-            href="/dashboard"
+          <Link
+            to="/dashboard"
             className="flex items-center justify-center space-x-2 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
           >
             <FiMapPin className="w-5 h-5 text-purple-600" />
             <span className="font-medium text-purple-900">Dashboard</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

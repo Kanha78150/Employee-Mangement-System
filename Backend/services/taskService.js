@@ -66,12 +66,29 @@ exports.updateTaskStatus = async (reqUser, taskId, completion) => {
     throw new Error("Not authorized for this task");
   }
 
+  const previousCompletion = task.completion;
   task.completion = completion;
+
+  // Always update the last updated time and user for any progress change
+  task.lastUpdatedTime = new Date();
+  task.lastUpdatedBy = reqUser.id;
+
+  // Set submission time when task is completed (100%)
+  if (completion === 100 && previousCompletion < 100) {
+    task.submissionTime = new Date();
+  }
+  // Clear submission time if task is moved back from completed state
+  else if (completion < 100 && previousCompletion === 100) {
+    task.submissionTime = null;
+  }
+
   await task.save();
 
   await AuditLog.create({
     user: reqUser.id,
-    action: `Updated task ${taskId} status to ${completion}%`,
+    action: `Updated task ${taskId} status from ${previousCompletion}% to ${completion}%${
+      completion === 100 ? " (Completed)" : ""
+    }`,
   });
 
   return task;
@@ -79,5 +96,7 @@ exports.updateTaskStatus = async (reqUser, taskId, completion) => {
 
 // Admin – get all tasks
 exports.getAllTasks = async () => {
-  return Task.find().populate("employee", "name employeeId");
+  return Task.find()
+    .populate("employee", "name employeeId")
+    .populate("lastUpdatedBy", "name employeeId");
 };

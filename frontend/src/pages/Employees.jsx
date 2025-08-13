@@ -12,6 +12,8 @@ import {
   FiUsers,
   FiSearch,
   FiPlus,
+  FiMapPin,
+  FiPhone,
 } from "react-icons/fi";
 
 const formatDate = (dateString) => {
@@ -37,6 +39,9 @@ export default function Employees() {
     date_of_birth: "",
     date_of_joining: new Date().toISOString().split("T")[0],
     gender: "",
+    contactNumber: "",
+    designation: "", // This will be used for Position/Designation
+    location: "",
   });
 
   const [editingEmployee, setEditingEmployee] = useState(null);
@@ -161,6 +166,9 @@ export default function Employees() {
       date_of_birth: emp.date_of_birth?.split("T")[0] || "",
       date_of_joining: emp.date_of_joining?.split("T")[0] || "",
       gender: emp.gender,
+      contactNumber: emp.contactNumber || "",
+      designation: emp.designation || "",
+      location: emp.location || "",
     });
   };
 
@@ -363,6 +371,9 @@ export default function Employees() {
                   date_of_birth: "",
                   date_of_joining: new Date().toISOString().split("T")[0],
                   gender: "",
+                  contactNumber: "",
+                  designation: "",
+                  location: "",
                 });
               }}
               className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -490,6 +501,68 @@ export default function Employees() {
                   <option value="Other">Other</option>
                 </select>
               </div>
+
+              {/* New Fields */}
+              <div>
+                <label className="block mb-2 font-medium text-gray-700">
+                  Contact Number
+                </label>
+                <input
+                  type="tel"
+                  name="contactNumber"
+                  value={form.contactNumber}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g., +1 234 567 8900"
+                  className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 font-medium text-gray-700">
+                  Position/Designation
+                </label>
+                <input
+                  type="text"
+                  name="designation"
+                  value={form.designation}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g., Software Engineer, Manager, Team Lead"
+                  className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 font-medium text-gray-700">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={form.location}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g., New York, Remote, Building A"
+                  className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 font-medium text-gray-700">
+                  Role
+                </label>
+                <select
+                  className="border border-blue-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                  name="role"
+                  value={form.role}
+                  onChange={handleChange}
+                >
+                  <option value="employee">Employee</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+
               <div>
                 <label className="block mb-2 font-medium text-gray-700">
                   Image
@@ -524,6 +597,9 @@ export default function Employees() {
                       date_of_birth: "",
                       date_of_joining: new Date().toISOString().split("T")[0],
                       gender: "",
+                      contactNumber: "",
+                      designation: "",
+                      location: "",
                     });
                   }}
                   className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold shadow transition w-full sm:w-auto cursor-pointer"
@@ -554,11 +630,20 @@ export default function Employees() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center space-x-2">
                     <FiMail className="w-4 h-4" />
-                    <span>Contact</span>
+                    <span>Contact Info</span>
                   </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Department
+                  <div className="flex items-center space-x-2">
+                    <FiUser className="w-4 h-4" />
+                    <span>Position & Department</span>
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center space-x-2">
+                    <FiMapPin className="w-4 h-4" />
+                    <span>Location</span>
+                  </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center space-x-2">
@@ -574,7 +659,7 @@ export default function Employees() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredEmployees.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center">
+                  <td colSpan="6" className="px-6 py-12 text-center">
                     <div className="text-gray-500">
                       <FiUsers className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                       <p className="text-lg font-medium">No employees found</p>
@@ -625,18 +710,44 @@ export default function Employees() {
                     {/* Contact Info */}
                     <td className="px-6 py-4">
                       <div className="space-y-1">
-                        <div className="text-sm text-gray-900">{emp.email}</div>
+                        <div className="flex items-center space-x-2">
+                          <FiMail className="w-4 h-4 text-gray-400" />
+                          <span className="text-sm text-gray-900">
+                            {emp.email}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <FiPhone className="w-4 h-4 text-gray-400" />
+                          <span className="text-sm text-gray-600">
+                            {emp.contactNumber || "Not provided"}
+                          </span>
+                        </div>
                         <div className="text-xs text-gray-500">
                           {emp.gender || "Not specified"}
                         </div>
                       </div>
                     </td>
 
-                    {/* Department */}
+                    {/* Position & Department */}
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {emp.department}
-                      </span>
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium text-gray-900">
+                          {emp.designation || "Position not specified"}
+                        </div>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {emp.department}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* Location */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-2">
+                        <FiMapPin className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">
+                          {emp.location || "Location not specified"}
+                        </span>
+                      </div>
                     </td>
 
                     {/* Dates */}

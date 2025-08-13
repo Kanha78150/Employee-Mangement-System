@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import api from "../api/axiosInstance";
 import LoadingSpinner, { SkeletonCard } from "../components/LoadingSpinner";
 import {
@@ -8,13 +9,19 @@ import {
   FaClock,
 } from "react-icons/fa";
 import { SiGoogletasks } from "react-icons/si";
-import { FiUsers, FiTrendingUp, FiActivity } from "react-icons/fi";
+import { FiUsers, FiTrendingUp, FiActivity, FiRefreshCw } from "react-icons/fi";
 
 export default function Dashboard() {
-  const { data, isLoading, error } = useQuery({
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["analytics"],
     queryFn: async () => (await api.get("/analytics")).data,
   });
+
+  const handleRefresh = () => {
+    refetch();
+  };
 
   if (isLoading) {
     return (
@@ -55,8 +62,7 @@ export default function Dashboard() {
       color: "blue",
       bgColor: "bg-blue-50",
       iconColor: "text-blue-600",
-      change: "+12%",
-      changeType: "increase",
+      subtitle: "Active employees",
     },
     {
       title: "Total Tasks",
@@ -65,8 +71,7 @@ export default function Dashboard() {
       color: "green",
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
-      change: "+8%",
-      changeType: "increase",
+      subtitle: "All assigned tasks",
     },
     {
       title: "Completed Tasks",
@@ -75,8 +80,20 @@ export default function Dashboard() {
       color: "purple",
       bgColor: "bg-purple-50",
       iconColor: "text-purple-600",
-      change: "+15%",
-      changeType: "increase",
+      subtitle: `${
+        data?.totalTasks > 0
+          ? Math.round((data?.completedTasks / data?.totalTasks) * 100)
+          : 0
+      }% completion rate`,
+    },
+    {
+      title: "In Progress",
+      value: data?.inProgressTasks || 0,
+      icon: FiActivity,
+      color: "yellow",
+      bgColor: "bg-yellow-50",
+      iconColor: "text-yellow-600",
+      subtitle: "Tasks being worked on",
     },
     {
       title: "Pending Tasks",
@@ -85,8 +102,16 @@ export default function Dashboard() {
       color: "orange",
       bgColor: "bg-orange-50",
       iconColor: "text-orange-600",
-      change: "-5%",
-      changeType: "decrease",
+      subtitle: "Not started yet",
+    },
+    {
+      title: "Average Progress",
+      value: `${data?.averageCompletion || 0}%`,
+      icon: FiTrendingUp,
+      color: "indigo",
+      bgColor: "bg-indigo-50",
+      iconColor: "text-indigo-600",
+      subtitle: "Overall completion",
     },
   ];
 
@@ -103,42 +128,42 @@ export default function Dashboard() {
               Monitor your team's performance and manage operations efficiently.
             </p>
           </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <FiActivity className="w-4 h-4" />
-            <span>Last updated: {new Date().toLocaleTimeString()}</span>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleRefresh}
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <FiRefreshCw className="w-4 h-4" />
+              <span>Refresh</span>
+            </button>
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <FiActivity className="w-4 h-4" />
+              <span>Last updated: {new Date().toLocaleTimeString()}</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 transform hover:scale-105"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div className={`p-3 rounded-lg ${stat.bgColor}`}>
                 <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
               </div>
-              <div
-                className={`flex items-center space-x-1 text-sm ${
-                  stat.changeType === "increase"
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                <FiTrendingUp className="w-4 h-4" />
-                <span>{stat.change}</span>
-              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="text-sm font-medium text-gray-600">
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 mb-1">
                 {stat.title}
               </h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold text-gray-900 mb-2">
                 {stat.value}
               </p>
+              <p className="text-xs text-gray-500">{stat.subtitle}</p>
             </div>
           </div>
         ))}
@@ -150,18 +175,27 @@ export default function Dashboard() {
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center space-x-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+          <Link
+            to="/employees"
+            className="flex items-center space-x-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+          >
             <FaAddressBook className="w-5 h-5 text-blue-600" />
-            <span className="font-medium text-blue-900">Add Employee</span>
-          </button>
-          <button className="flex items-center space-x-3 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+            <span className="font-medium text-blue-900">Manage Employees</span>
+          </Link>
+          <Link
+            to="/tasks"
+            className="flex items-center space-x-3 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+          >
             <SiGoogletasks className="w-5 h-5 text-green-600" />
-            <span className="font-medium text-green-900">Create Task</span>
-          </button>
-          <button className="flex items-center space-x-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+            <span className="font-medium text-green-900">Assign Tasks</span>
+          </Link>
+          <Link
+            to="/analytics"
+            className="flex items-center space-x-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
+          >
             <FaChartLine className="w-5 h-5 text-purple-600" />
             <span className="font-medium text-purple-900">View Analytics</span>
-          </button>
+          </Link>
         </div>
       </div>
     </div>
