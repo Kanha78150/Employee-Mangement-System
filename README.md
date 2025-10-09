@@ -101,17 +101,18 @@ Employee Dashboard/
    **Backend `.env`:**
    ```env
    # Database
-   MONGO_URI=mongodb://localhost:27017/employee_management
+   MONGO_URI="YOUR MONOGODB DATABASE URI"
    
    # JWT Configuration
    JWT_SECRET=your_super_secure_jwt_secret_change_this_in_production
    JWT_EXPIRES_IN=7d
    
    # Server Configuration
-   PORT=5000
+   PORT="ADD YOUR PORT NUMBER"
    NODE_ENV=development
    
-   # Admin Configuration
+   # Default Admin Configuration
+   # After first login you can change the password.
    ADMIN_EMAIL=admin@company.com
    ADMIN_PASSWORD=SecureAdmin123!
    ADMIN_NAME=System Administrator
@@ -199,40 +200,6 @@ Employee Dashboard/
 - **Toast Notifications** - User-friendly feedback system
 - **Loading States** - Skeleton loaders and spinners
 - **Error Boundaries** - Graceful error handling
-- **Dark/Light Theme Support** - Modern UI design patterns
-
-## 🔧 Development
-
-### Available Scripts
-
-**Frontend:**
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
-```
-
-**Backend:**
-```bash
-npm start            # Start production server
-npm run dev          # Start development server with nodemon
-npm test             # Run tests
-```
-
-## 📦 Deployment
-
-### Frontend (Vercel)
-1. Connect GitHub repository to Vercel
-2. Set build command: `cd frontend && npm run build`
-3. Set output directory: `frontend/dist`
-4. Configure environment variables in Vercel dashboard
-
-### Backend (Railway/Heroku)
-1. Connect GitHub repository to hosting platform
-2. Set start command: `cd backend && npm start`
-3. Configure environment variables in platform dashboard
-4. Ensure MongoDB Atlas connection for production
 
 ## 🤝 Contributing
 
@@ -242,17 +209,13 @@ npm test             # Run tests
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🆘 Support
 
 For support and questions:
 - Create an issue in the GitHub repository
-- Contact the development team
-- Check the documentation for common solutions
+- Contact with me.
+- Fell free to contact with me.
 
 ---
 
-**Built with ❤️ for efficient employee management**
+**Developed By Bholasankar Nanda ❤️**
