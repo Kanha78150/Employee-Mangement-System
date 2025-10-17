@@ -105,10 +105,7 @@ export default function ChangePassword() {
         confirmPassword: form.confirmPassword,
       });
 
-      toast.success(
-        "Password changed successfully! Please login with your new password."
-      );
-
+      // Success message will be shown by axios interceptor
       // ✅ Clean up temporary token and logout
       localStorage.removeItem("tempToken");
       delete api.defaults.headers.common["Authorization"];
@@ -117,7 +114,6 @@ export default function ChangePassword() {
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || "Failed to change password";
-      toast.error(errorMessage);
 
       if (errorMessage.includes("Current password is incorrect")) {
         setErrors({ currentPassword: "Current password is incorrect" });

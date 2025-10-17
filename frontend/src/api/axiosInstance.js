@@ -20,7 +20,6 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error("Request interceptor error:", error);
     return Promise.reject(error);
   }
 );
@@ -28,68 +27,80 @@ api.interceptors.request.use(
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => {
-    // Calculate request duration
-    const endTime = new Date();
-    const duration = endTime - response.config.metadata.startTime;
-
-    // Log successful requests in development only
-    if (import.meta.env.VITE_NODE_ENV === "development") {
-      // Only log in development - removed for production
+    // Show success message if provided by backend
+    if (
+      response.data?.success &&
+      response.data?.message &&
+      response.config.method !== "get"
+    ) {
+      toast.success(response.data.message);
     }
 
     return response;
   },
   (error) => {
-    // Calculate request duration if available
-    const duration = error.config?.metadata
-      ? new Date() - error.config.metadata.startTime
-      : "unknown";
-
-    // Log error details only in development
-    if (import.meta.env.VITE_NODE_ENV === "development") {
-      // Error logging removed for production
-    }
-
     // Handle different types of errors
     if (error.response) {
       // Server responded with error status
       const { status, data } = error.response;
 
       switch (status) {
-        case 401:
+        case 400: {
+          // Bad request - show specific error message
+          toast.error(
+            data?.message || "Invalid request. Please check your input."
+          );
+          break;
+        }
+
+        case 401: {
           // Unauthorized - redirect to login
           if (window.location.pathname !== "/login") {
             localStorage.removeItem("token");
-            toast.error("Session expired. Please login again.");
+            toast.error(
+              data?.message || "Session expired. Please login again."
+            );
             window.location.href = "/login";
+          } else {
+            toast.error(
+              data?.message || "Invalid credentials. Please try again."
+            );
           }
           break;
+        }
 
-        case 403:
+        case 403: {
           toast.error(
-            "Access denied. You don't have permission to perform this action."
+            data?.message ||
+              "Access denied. You don't have permission to perform this action."
           );
           break;
+        }
 
-        case 404:
-          toast.error("Resource not found.");
+        case 404: {
+          toast.error(data?.message || "Resource not found.");
           break;
+        }
 
-        case 429:
+        case 429: {
           toast.error("Too many requests. Please try again later.");
           break;
+        }
 
-        case 500:
-          toast.error("Server error. Please try again later.");
+        case 500: {
+          toast.error(data?.message || "Server error. Please try again later.");
           break;
+        }
 
-        default:
+        default: {
           // Use server error message if available
           const errorMessage =
             data?.error?.message ||
             data?.message ||
             "An unexpected error occurred";
           toast.error(errorMessage);
+          break;
+        }
       }
     } else if (error.request) {
       // Network error

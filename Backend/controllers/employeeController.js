@@ -17,19 +17,32 @@ exports.createEmployee = async (req, res, next) => {
       req.user.id,
       employeeData
     );
-    res.status(201).json(employee);
+    res.status(201).json({
+      success: true,
+      message: `Employee ${employee.name} created successfully! Employee ID: ${employee.employeeId}`,
+      data: employee,
+    });
   } catch (err) {
     console.error("Create employee error:", err);
-    next(err);
+    res.status(400).json({
+      success: false,
+      message: err.message || "Failed to create employee. Please try again.",
+    });
   }
 };
 
 exports.getEmployees = async (req, res, next) => {
   try {
     const result = await employeeService.getEmployees(req.query);
-    res.json(result);
+    res.json({
+      success: true,
+      ...result,
+    });
   } catch (err) {
-    next(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch employees. Please try again.",
+    });
   }
 };
 
@@ -37,14 +50,27 @@ exports.getEmployeeById = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (req.user.role === "employee" && req.user.id !== id) {
-      return res.status(403).json({ message: "Unauthorized access" });
+      return res.status(403).json({
+        success: false,
+        message:
+          "You don't have permission to view this employee's information",
+      });
     }
     const employee = await employeeService.getEmployeeById(id);
     if (!employee)
-      return res.status(404).json({ message: "Employee not found" });
-    res.json(employee);
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    res.json({
+      success: true,
+      data: employee,
+    });
   } catch (err) {
-    next(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch employee details. Please try again.",
+    });
   }
 };
 
@@ -68,11 +94,21 @@ exports.updateProfile = async (req, res, next) => {
 
     const employee = await employeeService.updateProfile(id, updateData);
     if (!employee) {
-      return res.status(404).json({ message: "Employee not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
     }
-    res.json(employee);
+    res.json({
+      success: true,
+      message: `Employee ${employee.name} updated successfully!`,
+      data: employee,
+    });
   } catch (err) {
-    next(err);
+    res.status(400).json({
+      success: false,
+      message: err.message || "Failed to update employee. Please try again.",
+    });
   }
 };
 
@@ -83,12 +119,21 @@ exports.deleteEmployee = async (req, res, next) => {
     // Check if employee exists before deletion
     const employee = await employeeService.getEmployeeById(id);
     if (!employee) {
-      return res.status(404).json({ message: "Employee not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
     }
     const result = await employeeService.deleteEmployee(req.user.id, id);
-    res.json(result);
+    res.json({
+      success: true,
+      message: `Employee ${employee.name} has been deleted successfully!`,
+    });
   } catch (err) {
     console.error("Delete error:", err);
-    next(err);
+    res.status(400).json({
+      success: false,
+      message: err.message || "Failed to delete employee. Please try again.",
+    });
   }
 };

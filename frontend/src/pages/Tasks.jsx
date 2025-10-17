@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axiosInstance";
-import { toast } from "react-toastify";
 import LoadingSpinner, { SkeletonCard } from "../components/LoadingSpinner";
 import {
   FiUser,
@@ -38,10 +37,13 @@ export default function Tasks() {
   });
 
   // Get task statistics
-  const { data: allTasks = [] } = useQuery({
+  const { data: tasksResponse } = useQuery({
     queryKey: ["allTasks"],
     queryFn: async () => (await api.get("/tasks")).data,
   });
+
+  // Extract tasks array from response
+  const allTasks = tasksResponse?.data || [];
 
   // Calculate stats from tasks data
   const taskStats = {
@@ -57,7 +59,6 @@ export default function Tasks() {
     mutationFn: async (newTask) =>
       (await api.post("/tasks/assign", newTask)).data,
     onSuccess: () => {
-      toast.success("Task assigned successfully!");
       queryClient.invalidateQueries(["employees"]);
       queryClient.invalidateQueries(["allTasks"]);
       setTask({
@@ -71,7 +72,7 @@ export default function Tasks() {
         organization: "",
         priority: "Medium",
       });
-      setShowForm(false); // Hide form after successful submission
+      setShowForm(false);
     },
   });
 

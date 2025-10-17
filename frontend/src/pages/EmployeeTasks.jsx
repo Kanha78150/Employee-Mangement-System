@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import { toast } from "react-toastify";
 import LoadingSpinner, { SkeletonCard } from "../components/LoadingSpinner";
 import {
   FiUser,
@@ -28,7 +27,10 @@ export default function EmployeeTasks() {
 
   const { data: employeeDetails } = useQuery({
     queryKey: ["employeeDetails", user.id],
-    queryFn: async () => (await api.get(`/employees/${user.id}`)).data,
+    queryFn: async () => {
+      const response = await api.get(`/employees/${user.id}`);
+      return response.data?.data || response.data;
+    },
     enabled: !!user?.id,
   });
 
@@ -41,16 +43,18 @@ export default function EmployeeTasks() {
     });
   };
 
-  const { data: tasks = [], isLoading } = useQuery({
+  const { data: tasksResponse, isLoading } = useQuery({
     queryKey: ["employeeTasks", user?.id],
     queryFn: async () => (await api.get(`/tasks/employee/${user.id}`)).data,
   });
+
+  // Extract tasks array from response
+  const tasks = tasksResponse?.data || [];
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, completion }) =>
       (await api.put(`/tasks/update/${id}`, { completion })).data,
     onSuccess: () => {
-      toast.success("Task Status Updated Successfully");
       queryClient.invalidateQueries(["employeeTasks", user?.id]);
     },
   });

@@ -6,18 +6,31 @@ exports.assignTask = async (req, res, next) => {
       ...req.body,
     };
     const task = await taskService.assignTask(req.user.id, taskData);
-    res.status(201).json(task);
+    res.status(201).json({
+      success: true,
+      message: `Task "${task.title}" assigned successfully!`,
+      data: task,
+    });
   } catch (err) {
-    next(err);
+    res.status(400).json({
+      success: false,
+      message: err.message || "Failed to assign task. Please try again.",
+    });
   }
 };
 
 exports.getEmployeeTasks = async (req, res, next) => {
   try {
     const tasks = await taskService.getEmployeeTasks(req.user, req.params.id);
-    res.json(tasks);
+    res.json({
+      success: true,
+      data: tasks,
+    });
   } catch (err) {
-    next(err);
+    res.status(403).json({
+      success: false,
+      message: err.message || "You don't have permission to view these tasks.",
+    });
   }
 };
 
@@ -25,9 +38,15 @@ exports.getEmployeeTasks = async (req, res, next) => {
 exports.getMyTasks = async (req, res, next) => {
   try {
     const tasks = await taskService.getMyTasks(req.user.id);
-    res.json(tasks);
+    res.json({
+      success: true,
+      data: tasks,
+    });
   } catch (err) {
-    next(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch your tasks. Please try again.",
+    });
   }
 };
 
@@ -38,9 +57,24 @@ exports.updateTaskStatus = async (req, res, next) => {
       req.params.id,
       req.body.completion
     );
-    res.json(task);
+
+    let message = "Task status updated successfully!";
+    if (req.body.completion === 100) {
+      message = "Congratulations! Task marked as completed!";
+    } else if (req.body.completion === 0) {
+      message = "Task status reset to pending.";
+    }
+
+    res.json({
+      success: true,
+      message,
+      data: task,
+    });
   } catch (err) {
-    next(err);
+    res.status(400).json({
+      success: false,
+      message: err.message || "Failed to update task status. Please try again.",
+    });
   }
 };
 
@@ -48,8 +82,14 @@ exports.updateTaskStatus = async (req, res, next) => {
 exports.getAllTasks = async (req, res, next) => {
   try {
     const tasks = await taskService.getAllTasks();
-    res.json(tasks);
+    res.json({
+      success: true,
+      data: tasks,
+    });
   } catch (err) {
-    next(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch tasks. Please try again.",
+    });
   }
 };

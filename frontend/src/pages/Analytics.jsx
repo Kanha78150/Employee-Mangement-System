@@ -25,10 +25,13 @@ export default function Analytics() {
   const [completionRange, setCompletionRange] = useState("");
   const [dateFilter, setDateFilter] = useState("");
 
-  const { data: allTasks = [], isLoading } = useQuery({
+  const { data: tasksResponse, isLoading } = useQuery({
     queryKey: ["allTasks"],
     queryFn: async () => (await api.get(`/tasks`)).data,
   });
+
+  // Extract tasks array from response
+  const allTasks = tasksResponse?.data || [];
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";

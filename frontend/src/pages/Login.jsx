@@ -52,13 +52,12 @@ export default function Login() {
         });
       }
 
-      // ✅ Extract token from response - handle both admin and employee response formats
+      // ✅ Extract token from response
       let token;
       if (form.type === "admin") {
-        // Admin response: { token: "...", isFirstLogin: true/false, message: "..." }
         token = res.data.token;
       } else {
-        // Employee response: { token: "..." } or { token: { token: "..." } }
+        // Employee response: { success: true, token: { token: "..." } } or { token: "..." }
         if (res.data && res.data.token && typeof res.data.token === "string") {
           token = res.data.token;
         } else if (
@@ -66,7 +65,6 @@ export default function Login() {
           typeof res.data.token === "object" &&
           res.data.token.token
         ) {
-          // Handle nested token object
           token = res.data.token.token;
         } else {
           toast.error("Login failed: Invalid response format");
@@ -82,9 +80,9 @@ export default function Login() {
 
       // ✅ Normal login flow
       login(token);
-      toast.success("Login successful!");
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed");
+      // Success message will be shown by axios interceptor
+    } catch {
+      // Error will be handled by axios interceptor
     }
   };
 

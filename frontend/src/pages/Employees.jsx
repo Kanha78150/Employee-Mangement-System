@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import api from "../api/axiosInstance";
-import { toast } from "react-toastify";
 import LoadingSpinner, { SkeletonTableRow } from "../components/LoadingSpinner";
 import {
   FiEdit2,
@@ -49,13 +48,8 @@ export default function Employees() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["employees"],
     queryFn: async () => {
-      try {
-        const response = await api.get("/employees");
-        return response.data;
-      } catch (error) {
-        toast.error("Failed to fetch employees: " + error.message);
-        throw error;
-      }
+      const response = await api.get("/employees");
+      return response.data;
     },
     refetchOnWindowFocus: true,
     refetchOnMount: true,
@@ -64,17 +58,12 @@ export default function Employees() {
 
   const createEmployee = useMutation({
     mutationFn: async (newEmp) => {
-      try {
-        const response = await api.post("/employees", newEmp);
-        return response.data;
-      } catch (error) {
-        throw new Error(error.response?.data?.message || error.message);
-      }
+      const response = await api.post("/employees", newEmp);
+      return response.data;
     },
     onSuccess: () => {
-      toast.success("Employee created successfully!");
       queryClient.invalidateQueries(["employees"]);
-      setShowForm(false); // ✅ Close the form after successful creation
+      setShowForm(false);
       setForm({
         name: "",
         email: "",
@@ -86,28 +75,19 @@ export default function Employees() {
         date_of_joining: new Date().toISOString().split("T")[0],
         gender: "",
       });
-    },
-    onError: (error) => {
-      toast.error("Failed to create employee: " + error.message);
     },
   });
 
   const updateEmployee = useMutation({
     mutationFn: async ({ id, data }) => {
-      try {
-        data.delete("employeeId");
-        const response = await api.put(`/employees/${id}`, data);
-        return response.data;
-      } catch (error) {
-        toast.error("Failed to update employee: " + error.message);
-        throw error;
-      }
+      data.delete("employeeId");
+      const response = await api.put(`/employees/${id}`, data);
+      return response.data;
     },
-    onSuccess: (data) => {
-      toast.success("Employee updated successfully!");
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       setEditingEmployee(null);
-      setShowForm(false); // ✅ Close the form after successful update
+      setShowForm(false);
       setForm({
         name: "",
         email: "",
@@ -120,27 +100,15 @@ export default function Employees() {
         gender: "",
       });
     },
-    onError: (error) => {
-      toast.error("Failed to update employee: " + error.message);
-    },
   });
 
   const deleteEmployee = useMutation({
     mutationFn: async (id) => {
-      try {
-        const response = await api.delete(`/employees/${id}`);
-        return response.data;
-      } catch (error) {
-        // Error handling removed for production
-        throw error;
-      }
+      const response = await api.delete(`/employees/${id}`);
+      return response.data;
     },
     onSuccess: () => {
-      toast.success("Employee permanently deleted from database!");
       queryClient.invalidateQueries(["employees"]);
-    },
-    onError: (error) => {
-      toast.error("Failed to delete employee: " + error.message);
     },
   });
 
@@ -196,7 +164,7 @@ export default function Employees() {
 
     const missingFields = Object.entries(requiredFields)
       .filter(([key, label]) => label && !form[key])
-      .map(([_, label]) => label);
+      .map(([, label]) => label);
 
     if (missingFields.length > 0) {
       alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
@@ -219,17 +187,13 @@ export default function Employees() {
       }
     });
 
-    try {
-      if (editingEmployee) {
-        updateEmployee.mutate({
-          id: editingEmployee,
-          data: formData,
-        });
-      } else {
-        createEmployee.mutate(formData);
-      }
-    } catch (error) {
-      toast.error("Error submitting form: " + error.message);
+    if (editingEmployee) {
+      updateEmployee.mutate({
+        id: editingEmployee,
+        data: formData,
+      });
+    } else {
+      createEmployee.mutate(formData);
     }
   };
 
