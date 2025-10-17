@@ -86,7 +86,10 @@ app.use(generalLimiter);
 // ✅ CORS Configuration - Environment-based
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:5173", "http://localhost:3000"];
+  : [
+      "https://employee-mangement-system-blush-delta.vercel.app/",
+      "https://employee-mangement-system-i10r.onrender.com",
+    ];
 
 app.use(
   cors({
